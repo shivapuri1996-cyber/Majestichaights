@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Majestic Heights - Smart Bill</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+:root{--primary:#6366f1;--accent:#8b5cf6;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--bg:#f8fafc;--card:#fff;--text:#1e293b;--border:#e2e8f0;--shadow:0 10px 30px rgba(0,0,0,0.08)}
+[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--border:#334155;--shadow:0 10px 30px rgba(0,0,0,0.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text);padding:16px;min-height:100vh}
+.container{max-width:1100px;margin:0 auto}
+header{text-align:center;margin-bottom:20px}
+h1{font-size:2.1rem;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{opacity:.9;margin-top:6px;font-size:1rem}
+.theme-btn,.fab{position:fixed;z-index:1000;border:none;border-radius:50%;width:52px;height:52px;color:#fff;cursor:pointer;box-shadow:var(--shadow)}
+.theme-btn{top:18px;right:18px;background:rgba(0,0,0,.28);backdrop-filter:blur(6px)}
+.fab{right:18px;bottom:18px;background:var(--primary)}
+.tabs{display:flex;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{flex:1;padding:14px;border:0;background:transparent;cursor:pointer;font-weight:600;font-size:0.95rem}
+.tab-btn.active{background:var(--primary);color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block;padding:0}
+.form-card{background:var(--card);border-radius:12px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+label{display:block;margin-bottom:8px;font-weight:600;font-size:0.95rem}
+input,select{width:100%;padding:12px;border-radius:10px;border:2px solid var(--border);font-size:15px}
+input[readonly]{background:#f1f5f9;color:#64748b}
+.btn{padding:12px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:0.95rem}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.table-container{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);margin-top:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th,td{padding:12px;text-align:center;border-bottom:1px solid var(--border)}
+th{background:rgba(99,102,241,.1);color:var(--primary);text-transform:uppercase;font-weight:700;font-size:0.85rem}
+.action-btn{padding:8px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer;font-size:0.9rem}
+.action-whatsapp{background:#25D366;color:#fff}
+.action-delete{background:#ef4444;color:#fff}
+
+/* Summary Cards */
+.summary-card {
+  background:var(--card);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-bottom:20px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+}
+.summary-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  margin-top:12px;
+}
+.summary-item {
+  padding:12px;
+  border-radius:10px;
+  text-align:center;
+  background:rgba(99,102,241,0.05);
+}
+.summary-item.positive { background:rgba(16,185,129,0.1); color:var(--success); }
+.summary-item.negative { background:rgba(239,68,68,0.1); color:var(--danger); }
+.summary-item h4 { margin:0 0 8px 0; font-size:0.9rem; opacity:0.9; }
+.summary-item .amount { font-size:1.4rem; font-weight:700; }
+
+@media (max-width:768px){
+  .tabs{flex-direction:column}
+  .tab-btn{font-size:0.9rem;padding:12px}
+  table{min-width:600px}
+}
+</style>
+</head>
+<body>
+<button class="theme-btn" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon"></i></button>
+<button class="fab" onclick="addNewEntry()" title="New entry"><i class="fas fa-plus"></i></button>
+
+<div class="container" id="screenshotArea">
+  <header>
+    <h1>Majestic Heights - Shivapuri</h1>
+    <div class="subtitle">Smart Electricity Billing • Salary • Maintenance • WhatsApp Ready</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="form">Electricity Entry</button>
+    <button class="tab-btn" data-tab="dashboard">Electricity Dashboard</button>
+    <button class="tab-btn" data-tab="bulk">Bulk Generate</button>
+    <button class="tab-btn" data-tab="salary">Salary</button>
+    <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+  </div>
+
+  <!-- Bill Entry -->
+  <div id="form" class="tab-content active">
+    <div class="form-card">
+      <h3 style="margin-bottom:10px;color:var(--primary)">New Bill Entry</h3>
+      <div class="form-group">
+        <label>Flat No</label>
+        <select id="flat" onchange="autoFillPrev()">
+          <option value="">Select Flat</option>
+          <option>101</option><option>102</option><option>201</option><option>202</option><option>301</option><option>302</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Month</label>
+        <select id="month">
+          <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
+          <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Previous Reading (auto)</label><input id="prev" type="number" readonly></div>
+      <div class="form-group"><label>Current Reading</label><input id="current" type="number" oninput="calculateUnits()" placeholder="Enter current meter reading"></div>
+      <div class="form-group"><label>Units Consumed</label><input id="consumed" type="number" readonly style="font-weight:bold;color:var(--primary)"></div>
+      <div class="form-group"><label>Amount (₹)</label><input id="amount" type="number"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success" style="flex:1" onclick="saveAndSendBill()">Save & Send</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveOnly()">Save Only</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="tab-content">
+    <div class="form-card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <select id="monthFilter" onchange="filterDashboard()"><option value="current">Current Month</option></select>
+      <button class="btn btn-primary" onclick="captureScreenshot()">Screenshot</button>
+    </div>
+    <div class="table-container" id="dashTableContainer">
+      <table id="dashTable">
+        <thead><tr><th>Flat</th><th>Month</th><th>Consumed</th><th>Amount</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bulk Generate -->
+  <div id="bulk" class="tab-content">
+    <div class="form-card">
+      <h3 style="color:var(--primary);margin-bottom:12px">Bulk Bill Generate (Enter Current Reading Only)</h3>
+      <div class="form-group">
+        <label>Select Floor</label>
+        <select id="bulkFloor" onchange="loadFlatsForBulk()">
+          <option value="">Select Floor</option>
+          <option value="1">1st Floor (101, 102)</option>
+          <option value="2">2nd Floor (201, 202)</option>
+          <option value="3">3rd Floor (301, 302)</option>
+          <option value="4">Common Area</option>        
+        </select>
+      </div>
+        <select id="month">
+          <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
+          <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
+        </select>
+      <div class="form-group">
+        <label>Total Amount to Distribute (₹)</label>
+        <input id="bulkTotalAmount" type="number" placeholder="Enter total floor bill amount">
+      </div>
+      <div id="bulkFlatInputs" style="margin:16px 0"></div>
+      <button class="btn btn-success" onclick="generateBulkBills()">Generate & Save Bills</button>
+    </div>
+  </div>
+
+  <!-- Salary Tab -->
+  <div id="salary" class="tab-content">
+    <div class="form-card">
+      <h3 style="margin-bottom:16px;color:var(--primary)">New Salary Payment Entry</h3>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="salaryDate" type="date">
+      </div>
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input id="salaryAmount" type="number" min="0">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="salaryStatus">
+          <option>Paid</option>
+          <option selected>Pending</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="saveSalary()">Save Entry</button>
+    </div>
+
+    <div class="summary-card">
+      <h3 style="margin:0 0 16px 0;color:var(--primary)">Salary Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <h4>Total Paid</h4>
+          <div class="amount" id="salaryTotalPaid">₹0</div>
+        </div>
+        <div class="summary-item">
+          <h4>Total Pending</h4>
+          <div class="amount" id="salaryTotalPending" style="color:var(--warning)">₹0</div>
+        </div>
+        <div class="summary-item positive">
+          <h4>Remaining to Pay</h4>
+          <div class="amount" id="salaryRemaining">₹0</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;text-align:right">
+        <button class="btn btn-primary" onclick="captureScreenshot()">Take Screenshot</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="salaryTable">
+        <thead><tr><th>S.No</th><th>Date</th><th>Amount (₹)</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Maintenance Tab -->
+  <div id="maintenance" class="tab-content">
+    <div class="form-card">
+      <h3 style="margin-bottom:16px;color:var(--primary)">New Maintenance Entry</h3>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="maintDate" type="date">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input id="maintDesc" type="text" placeholder="e.g. Lift repair, Common light bill">
+      </div>
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input id="maintAmount" type="number" min="0">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="maintType">
+          <option>Received</option>
+          <option selected>Expense</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="saveMaintenance()">Save Entry</button>
+    </div>
+
+    <div class="summary-card">
+      <h3 style="margin:0 0 16px 0;color:var(--primary)">Maintenance Account Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-item positive">
+          <h4>Total Received</h4>
+          <div class="amount" id="maintTotalReceived">₹0</div>
+        </div>
+        <div class="summary-item negative">
+          <h4>Total Expenses</h4>
+          <div class="amount" id="maintTotalExpenses">₹0</div>
+        </div>
+        <div class="summary-item" style="background:rgba(99,102,241,0.08)">
+          <h4>Net Balance</h4>
+          <div class="amount" id="maintNetBalance">₹0</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;text-align:right">
+        <button class="btn btn-primary" onclick="captureScreenshot()">Take Screenshot</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="maintTable">
+        <thead><tr><th>S.No</th><th>Date</th><th>Description</th><th>Amount (₹)</th><th>Type</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────────────────────────────
+// Data & Constants
+// ──────────────────────────────────────────────────────────────────────────────
+let billData = JSON.parse(localStorage.getItem('billData') || '[]');
+let lastClosingUnits = JSON.parse(localStorage.getItem('lastClosingUnits') || '{}');
+let salaryData = JSON.parse(localStorage.getItem('salaryData') || '[]');
+let maintenanceData = JSON.parse(localStorage.getItem('maintenanceData') || '[]');
+
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const currentMonth = months[new Date().getMonth()];
+const floors = {1:['101','102'], 2:['201','202'], 3:['301','302'], 4:['Common Area']};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Initialization
+// ──────────────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('month').value = currentMonth;
+  // Load all tabs content on start
+  filterDashboard();
+  displaySalary();
+  displayMaintenance();
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Theme Toggle
+// ──────────────────────────────────────────────────────────────────────────────
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  document.querySelector('.theme-btn i').classList.toggle('fa-moon');
+  document.querySelector('.theme-btn i').classList.toggle('fa-sun');
+}
+if(localStorage.getItem('theme') === 'dark') toggleTheme();
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Fixed & Improved Tab Switching
+// ──────────────────────────────────────────────────────────────────────────────
+function openTab(targetTab) {
+  // Hide all contents
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // Deactivate all buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Show selected tab content
+  const content = document.getElementById(targetTab);
+  if (content) content.classList.add('active');
+
+  // Activate corresponding button
+  const btn = document.querySelector(`.tab-btn[data-tab="${targetTab}"]`);
+  if (btn) btn.classList.add('active');
+
+  // Refresh content when switching tabs
+  if (targetTab === 'dashboard') filterDashboard();
+  if (targetTab === 'salary') displaySalary();
+  if (targetTab === 'maintenance') displayMaintenance();
+}
+
+// Add click listeners to all tab buttons using data-tab attribute
+document.querySelectorAll('.tab-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const tabName = button.getAttribute('data-tab');
+    openTab(tabName);
+  });
+});
+
+// For FAB new entry button
+function addNewEntry() {
+  openTab('form');
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Electricity Functions (unchanged)
+// ──────────────────────────────────────────────────────────────────────────────
+function autoFillPrev(){
+  const flat = document.getElementById('flat').value;
+  document.getElementById('prev').value = lastClosingUnits[flat] || '';
+  calculateUnits();
+}
+
+function calculateUnits(){
+  const prev = parseFloat(document.getElementById('prev').value) || 0;
+  const curr = parseFloat(document.getElementById('current').value) || 0;
+  document.getElementById('consumed').value = Math.max(curr - prev, 0);
+}
+
+function getFormData(){
+  return {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,9),
+    month: document.getElementById('month').value,
+    flat: document.getElementById('flat').value,
+    prev: document.getElementById('prev').value || 0,
+    current: document.getElementById('current').value || 0,
+    consumed: document.getElementById('consumed').value || 0,
+    amount: document.getElementById('amount').value || 0,
+    toDate: new Date().toISOString().slice(0,10)
+  };
+}
+
+function saveOnly(){
+  const data = getFormData();
+  if(!data.flat || !data.current || !data.amount) return alert('Fill all fields');
+  lastClosingUnits[data.flat] = data.current;
+  localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
+  billData.push(data);
+  localStorage.setItem('billData', JSON.stringify(billData));
+  alert('Saved');
+  clearForm();
+  filterDashboard();
+}
+
+function saveAndSendBill(){
+  const data = getFormData();
+  if(!data.flat || !data.current || !data.amount) return alert('Fill all fields');
+  lastClosingUnits[data.flat] = data.current;
+  localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
+  billData.push(data);
+  localStorage.setItem('billData', JSON.stringify(billData));
+
+  const msg = `*Majestic Heights - Shivapuri*\n\n` +
+              `Electricity Bill - ${data.month}\n\n` +
+              `Flat No: *${data.flat}*\n` +
+              `Reading Date: ${data.toDate}\n` +
+              `Previous Reading: ${data.prev} units\n` +
+              `Current Reading : ${data.current} units\n` +
+              `Total Consumed  : ${data.consumed} units\n\n` +
+              `Amount: *Rs${data.amount}/-*\n\n` +
+              `Please pay at the earliest.\nThank you!\nMajestic Heights`;
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  clearForm();
+  filterDashboard();
+}
+
+function clearForm(){
+  document.querySelectorAll('#form input, #form select').forEach(el => {
+    if(el.type !== 'file') el.value = '';
+  });
+  document.getElementById('month').value = currentMonth;
+}
+
+function filterDashboard(){
+  const filter = document.getElementById('monthFilter');
+  const selected = filter.value === 'current' ? currentMonth : filter.value;
+  const unique = [...new Set(billData.map(b => b.month))];
+  filter.innerHTML = `<option value="current">Current Month (${currentMonth})</option>`;
+  unique.sort((a,b)=>months.indexOf(a)-months.indexOf(b)).forEach(m=>filter.innerHTML+=`<option>${m}</option>`);
+
+  const filtered = billData.filter(b => b.month === selected);
+  const tbody = document.querySelector('#dashTable tbody');
+  tbody.innerHTML = '';
+  filtered.forEach(b => {
+    tbody.innerHTML += `<tr>
+      <td><strong>${b.flat}</strong></td>
+      <td>${b.month}</td>
+      <td>${b.consumed} units</td>
+      <td>₹${b.amount}</td>
+      <td style="display:flex;gap:6px">
+        <button class="action-btn action-whatsapp" onclick="resendBill('${b.id}')">Send</button>
+        <button class="action-btn action-delete" onclick="deleteBill('${b.id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+}
+
+function resendBill(id){
+  const b = billData.find(x=>x.id===id);
+  if(!b) return;
+  const msg = `*Majestic Heights - Shivapuri*\n\n` +
+              `Electricity Bill - ${b.month}\n\n` +
+              `Flat No: *${b.flat}*\n` +
+              `Reading Date: ${b.toDate}\n` +
+              `Previous Reading: ${b.prev} units\n` +
+              `Current Reading : ${b.current} units\n` +
+              `Total Consumed  : ${b.consumed} units\n\n` +
+              `Amount: *Rs${b.amount}/-*\n\n` +
+              `Please pay at the earliest.\nThank you!\nMajestic Heights`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+}
+
+function deleteBill(id){
+  if(confirm('Delete this bill?')){
+    billData = billData.filter(x=>x.id!==id);
+    localStorage.setItem('billData', JSON.stringify(billData));
+    filterDashboard();
+  }
+}
+
+function captureScreenshot(){
+  html2canvas(document.getElementById('screenshotArea'), {scale:2}).then(canvas=>{
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `Majestic_Heights_${new Date().toISOString().slice(0,10)}.png`;
+    a.click();
+  });
+}
+
+function loadFlatsForBulk(){
+  const floor = document.getElementById('bulkFloor').value;
+  const container = document.getElementById('bulkFlatInputs');
+  container.innerHTML = '';
+  if(!floor) return;
+
+  floors[floor].forEach(flat => {
+    const prev = lastClosingUnits[flat] || 0;
+    container.innerHTML += `
+      <div class="form-group" style="background:#f0f8ff;padding:12px;border-radius:10px;margin-bottom:10px">
+        <label style="font-weight:bold">Flat ${flat}</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1">
+            <small>Previous: ${prev} units</small><br>
+            <input type="number" id="current_${flat}" placeholder="Current Reading" style="margin-top:4px">
+          </div>
+          <div style="width:100px;text-align:center">
+            <small>Consumed</small><br>
+            <strong id="cons_${flat}" style="color:var(--primary)">0</strong>
+          </div>
+        </div>
+      </div>`;
+    
+    document.getElementById(`current_${flat}`).oninput = function(){
+      const curr = parseFloat(this.value) || 0;
+      document.getElementById(`cons_${flat}`).textContent = Math.max(curr - prev, 0);
+    };
+  });
+}
+
+function generateBulkBills(){
+  const floor = document.getElementById('bulkFloor').value;
+  const totalAmt = parseFloat(document.getElementById('bulkTotalAmount').value);
+  if(!floor || !totalAmt) return alert('Select floor and enter total amount');
+
+  let totalConsumed = 0;
+  const bills = [];
+
+  floors[floor].forEach(flat => {
+    const current = parseFloat(document.getElementById(`current_${flat}`).value) || 0;
+    const prev = parseFloat(lastClosingUnits[flat] || 0);
+    const consumed = Math.max(current - prev, 0);
+    totalConsumed += consumed;
+    bills.push({flat, current, consumed, prev});
+  });
+
+  if(totalConsumed === 0) return alert('Enter valid current readings');
+
+  bills.forEach(b => {
+    const amount = Math.round((b.consumed / totalConsumed) * totalAmt);
+    const bill = {
+      id: Date.now().toString(36)+Math.random().toString(36).substr(2,9),
+      flat: b.flat,
+      month: currentMonth,
+      prev: b.prev,
+      current: b.current,
+      consumed: b.consumed,
+      amount: amount,
+      toDate: new Date().toISOString().slice(0,10)
+    };
+    lastClosingUnits[b.flat] = b.current;
+    billData.push(bill);
+  });
+
+  localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
+  localStorage.setItem('billData', JSON.stringify(billData));
+  alert(`Bulk bills generated successfully for Floor ${floor}!\nTotal: ₹${totalAmt}`);
+  openTab('dashboard');
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Salary & Maintenance functions (unchanged)
+// ──────────────────────────────────────────────────────────────────────────────
+function saveSalary() {
+  const date = document.getElementById('salaryDate').value;
+  const amount = parseFloat(document.getElementById('salaryAmount').value);
+  const status = document.getElementById('salaryStatus').value;
+  if (!date || isNaN(amount) || amount <= 0) return alert('Please fill valid date and amount');
+  
+  salaryData.push({
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,9),
+    date,
+    amount,
+    status
+  });
+  localStorage.setItem('salaryData', JSON.stringify(salaryData));
+  document.getElementById('salaryDate').value = '';
+  document.getElementById('salaryAmount').value = '';
+  displaySalary();
+}
+
+function displaySalary() {
+  const tbody = document.querySelector('#salaryTable tbody');
+  tbody.innerHTML = '';
+  let totalPaid = 0;
+  let totalPending = 0;
+
+  salaryData.forEach((entry, index) => {
+    if (entry.status === 'Paid') totalPaid += entry.amount;
+    else totalPending += entry.amount;
+
+    tbody.innerHTML += `<tr>
+      <td>${index + 1}</td>
+      <td>${entry.date}</td>
+      <td>₹${entry.amount.toLocaleString('en-IN')}</td>
+      <td style="color:${entry.status==='Paid'?'var(--success)':'var(--warning)'}">${entry.status}</td>
+      <td><button class="action-btn action-delete" onclick="deleteSalary('${entry.id}')">Delete</button></td>
+    </tr>`;
+  });
+
+  const remaining = totalPending;
+
+  document.getElementById('salaryTotalPaid').textContent = `₹${totalPaid.toLocaleString('en-IN')}`;
+  document.getElementById('salaryTotalPending').textContent = `₹${totalPending.toLocaleString('en-IN')}`;
+  document.getElementById('salaryRemaining').textContent = `₹${remaining.toLocaleString('en-IN')}`;
+  document.getElementById('salaryRemaining').style.color = remaining > 0 ? 'var(--warning)' : 'var(--success)';
+}
+
+function deleteSalary(id) {
+  if (confirm('Delete this salary entry?')) {
+    salaryData = salaryData.filter(x => x.id !== id);
+    localStorage.setItem('salaryData', JSON.stringify(salaryData));
+    displaySalary();
+  }
+}
+
+function saveMaintenance() {
+  const date = document.getElementById('maintDate').value;
+  const desc = document.getElementById('maintDesc').value.trim();
+  const amount = parseFloat(document.getElementById('maintAmount').value);
+  const type = document.getElementById('maintType').value;
+  
+  if (!date || !desc || isNaN(amount) || amount <= 0) return alert('Please fill valid date, description and amount');
+  
+  maintenanceData.push({
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,9),
+    date,
+    desc,
+    amount,
+    type
+  });
+  localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
+  document.getElementById('maintDate').value = '';
+  document.getElementById('maintDesc').value = '';
+  document.getElementById('maintAmount').value = '';
+  displayMaintenance();
+}
+
+function displayMaintenance() {
+  const tbody = document.querySelector('#maintTable tbody');
+  tbody.innerHTML = '';
+  let totalReceived = 0;
+  let totalExpenses = 0;
+
+  maintenanceData.forEach((entry, index) => {
+    if (entry.type === 'Received') totalReceived += entry.amount;
+    else totalExpenses += entry.amount;
+
+    tbody.innerHTML += `<tr>
+      <td>${index + 1}</td>
+      <td>${entry.date}</td>
+      <td>${entry.desc}</td>
+      <td>₹${entry.amount.toLocaleString('en-IN')}</td>
+      <td style="color:${entry.type==='Received'?'var(--success)':'var(--danger)'}">${entry.type}</td>
+      <td><button class="action-btn action-delete" onclick="deleteMaintenance('${entry.id}')">Delete</button></td>
+    </tr>`;
+  });
+
+  const netBalance = totalReceived - totalExpenses;
+
+  document.getElementById('maintTotalReceived').textContent = `₹${totalReceived.toLocaleString('en-IN')}`;
+  document.getElementById('maintTotalExpenses').textContent = `₹${totalExpenses.toLocaleString('en-IN')}`;
+  document.getElementById('maintNetBalance').textContent = `₹${netBalance.toLocaleString('en-IN')}`;
+  document.getElementById('maintNetBalance').style.color = netBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+}
+
+function deleteMaintenance(id) {
+  if (confirm('Delete this maintenance entry?')) {
+    maintenanceData = maintenanceData.filter(x => x.id !== id);
+    localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
+    displayMaintenance();
+  }
+}
+</script>
+</body>
+</html>

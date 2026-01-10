@@ -149,7 +149,7 @@ th{background:rgba(99,102,241,.1);color:var(--primary);text-transform:uppercase;
           <option value="4">Common Area</option>        
         </select>
       </div>
-        <select id="month">
+      <select id="month">
           <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
           <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
         </select>
@@ -583,7 +583,7 @@ function displaySalary() {
     </tr>`;
   });
 
-  const remaining = totalPending;
+  const remaining = totalPaid - totalPending;
 
   document.getElementById('salaryTotalPaid').textContent = `₹${totalPaid.toLocaleString('en-IN')}`;
   document.getElementById('salaryTotalPending').textContent = `₹${totalPending.toLocaleString('en-IN')}`;

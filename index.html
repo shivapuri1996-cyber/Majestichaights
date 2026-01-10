@@ -622,7 +622,7 @@ function displaySalary(){
             </tr>`;
     });
 
-    const remaining = totalPending;
+    const remaining = totalPaid - totalPending;
 
     document.getElementById('salaryTotalPaid').textContent    = `₹${totalPaid.toLocaleString('en-IN')}`;
     document.getElementById('salaryTotalPending').textContent = `₹${totalPending.toLocaleString('en-IN')}`;

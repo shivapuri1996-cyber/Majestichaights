@@ -1,804 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Majestic Heights - Smart Bill</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<title>Majestic Heights Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+:root { 
+    --primary: #007AFF; --success: #34C759; --warning: #FF9500; --danger: #FF3B30; 
+    --bg: #F2F2F7; --card: rgba(255, 255, 255, 0.9); --text: #1C1C1E; --border: rgba(0,0,0,0.1);
+}
+[data-theme="dark"] { 
+    --bg: #000000; --card: rgba(28, 28, 30, 0.9); --text: #FFFFFF; --border: rgba(255,255,255,0.1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SF Pro Display', sans-serif; }
+body { background: var(--bg); color: var(--text); padding: 16px; transition: 0.3s; }
 
-    <style>
-        :root {
-            --primary: #6366f1;
-            --accent: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #fff;
-            --text: #1e293b;
-            --border: #e2e8f0;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --border: #334155;
-            --shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
+header { 
+    background: linear-gradient(135deg, #007AFF, #5856D6); 
+    padding: 25px 20px; border-radius: 20px; color: white; margin-bottom: 20px; 
+    box-shadow: 0 8px 20px rgba(0,122,255,0.2); 
+}
+header h1 { font-size: 1.6rem; }
 
-        * { box-sizing:border-box; margin:0; padding:0; }
-        body {
-            font-family: Inter, system-ui, Arial;
-            background: var(--bg);
-            color: var(--text);
-            padding: 16px;
-            min-height: 100vh;
-        }
-        .container { max-width: 1100px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 20px; }
-        h1 {
-            font-size: 2.1rem;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle { opacity: .9; margin-top: 6px; font-size: 1rem; }
+.tabs { display: flex; background: rgba(118,118,128,0.12); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 10px; border: 0; background: transparent; cursor: pointer; font-weight: 600; border-radius: 10px; color: var(--text); font-size: 0.8rem; }
+.tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        .theme-btn, .fab {
-            position: fixed;
-            z-index: 1000;
-            border: none;
-            border-radius: 50%;
-            width: 52px;
-            height: 52px;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-        .theme-btn { top: 18px; right: 18px; background: rgba(0,0,0,.28); backdrop-filter: blur(6px); }
-        .fab { right: 18px; bottom: 18px; background: var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-        .tabs {
-            display: flex;
-            background: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
-            border: 0;
-            background: transparent;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .tab-btn.active { background: var(--primary); color: #fff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; padding: 0; }
+.form-card { background: var(--card); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+.form-group { margin-bottom: 12px; }
+label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.8rem; opacity: 0.7; }
+input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none; }
 
-        .form-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid var(--border);
-            font-size: 15px;
-        }
-        input[readonly] { background: #f1f5f9; color: #64748b; }
+.btn { padding: 14px; border-radius: 12px; border: 0; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.2s; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
 
-        .btn {
-            padding: 12px;
-            border-radius: 10px;
-            border: 0;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-success { background: var(--success); color: #fff; }
-        .btn-danger { background: var(--danger); color: #fff; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
+.summary-item { padding: 15px; border-radius: 15px; color: white; text-align: center; }
+.sum-blue { background: linear-gradient(135deg, #007AFF, #00C6FF); }
+.sum-green { background: linear-gradient(135deg, #34C759, #32E0C4); }
+.sum-red { background: linear-gradient(135deg, #FF3B30, #FF2D55); }
+.amount { font-size: 1.1rem; font-weight: 700; display: block; }
 
-        .table-container {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: var(--shadow);
-            margin-top: 16px;
-            overflow-x: auto;
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); }
-        th {
-            background: rgba(99,102,241,.1);
-            color: var(--primary);
-            text-transform: uppercase;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
+.table-container { background: var(--card); border-radius: 15px; overflow-x: auto; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; min-width: 300px; }
+th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.7rem; color: #8E8E93; text-transform: uppercase; }
+td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
-        .action-btn {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 0;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .action-whatsapp { background: #25D366; color: #fff; }
-        .action-delete { background: #ef4444; color: #fff; }
+.img-preview { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
 
-        .add-entry-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 1.6rem;
-            box-shadow: 0 4px 15px rgba(16,185,129,0.4);
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            z-index: 999;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
-        }
-        .add-entry-btn:hover { transform: scale(1.08); }
+#loader { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; display: none; z-index: 9999; }
+.theme-btn, .fab { position: fixed; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.theme-btn { top: 15px; right: 15px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); color: white; }
+.fab { bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; font-size: 1.2rem; }
+.flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-        .hidden-form { display: none; }
-
-        /* Summary Cards */
-        .summary-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 12px;
-        }
-        .summary-item {
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            background: rgba(99,102,241,0.05);
-        }
-        .summary-item.positive { background: rgba(16,185,129,0.1); color: var(--success); }
-        .summary-item.negative { background: rgba(239,68,68,0.1); color: var(--danger); }
-        .summary-item h4 { margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.9; }
-        .summary-item .amount { font-size: 1.4rem; font-weight: 700; }
-
-        @media (max-width: 768px) {
-            .tabs { flex-direction: column; }
-            .tab-btn { font-size: 0.9rem; padding: 12px; }
-            table { min-width: 600px; }
-            .add-entry-btn { bottom: 80px; right: 16px; }
-        }
-    </style>
+.action-btn { border: 0; background: transparent; padding: 8px; cursor: pointer; font-size: 1.1rem; border-radius: 50%; transition: 0.2s; }
+.btn-wa { color: #32CD32; background: rgba(60, 179, 113, 0.2);} 
+.btn-wa:hover { background: rgba(50, 205, 50, 0.2); }
+.btn-del { color: var(--danger); }
+</style>
 </head>
 <body>
 
-<button class="theme-btn" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon"></i></button>
+<div id="loader">Syncing...</div>
+<button class="theme-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+<button class="fab" onclick="openTab('form')"><i class="fas fa-plus"></i></button>
 
 <div class="container" id="screenshotArea">
-
     <header>
-        <h1>Majestic Heights - Shivapuri</h1>
-        <div class="subtitle">Smart Electricity Billing • Salary • Maintenance • WhatsApp Ready</div>
+        <h1>Majestic Heights</h1>
+        <p style="font-size: 0.8rem; opacity: 0.9;">Shivapuri Billing System</p>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" data-tab="form">Electricity Entry</button>
-        <button class="tab-btn" data-tab="dashboard">Electricity Dashboard</button>
-        <button class="tab-btn" data-tab="bulk">Bulk Generate</button>
+        <button class="tab-btn active" data-tab="form">Entry</button>
+        <button class="tab-btn" data-tab="dashboard">Bills</button>
+        <button class="tab-btn" data-tab="bulk">Bulk</button>
         <button class="tab-btn" data-tab="salary">Salary</button>
-        <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+        <button class="tab-btn" data-tab="maintenance">Maint.</button>
     </div>
 
-    <!-- Electricity Entry -->
     <div id="form" class="tab-content active">
         <div class="form-card">
-            <h3 style="margin-bottom:10px;color:var(--primary)">New Bill Entry</h3>
-            <div class="form-group">
-                <label>Flat No</label>
-                <select id="flat" onchange="autoFillPrev()">
-                    <option value="">Select Flat</option>
-                    <option>101</option><option>102</option><option>201</option><option>202</option><option>301</option><option>302</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Month</label>
-                <select id="month">
-                    <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
-                    <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Previous Reading (auto)</label><input id="prev" type="number" readonly></div>
-            <div class="form-group"><label>Current Reading</label><input id="current" type="number" oninput="calculateUnits()" placeholder="Enter current meter reading"></div>
-            <div class="form-group"><label>Units Consumed</label><input id="consumed" type="number" readonly style="font-weight:bold;color:var(--primary)"></div>
+            <div class="form-group"><label>Flat No</label><select id="flat" onchange="autoFillPrev()"><option value="">Select</option><option>101</option><option>102</option><option>201</option><option>202</option><option>301</option><option>302</option></select></div>
+            <div class="form-group"><label>Month</label><select id="month"><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
+            <div class="form-group"><label>Prev Reading</label><input id="prev" type="number" readonly></div>
+            <div class="form-group"><label>Curr Reading</label><input id="current" type="number" oninput="calculateUnits()"></div>
+            <div class="form-group"><label>Consumed</label><input id="consumed" type="number" readonly></div>
             <div class="form-group"><label>Amount (₹)</label><input id="amount" type="number"></div>
-            <div style="display:flex;gap:8px">
-                <button class="btn btn-success" style="flex:1" onclick="saveAndSendBill()">Save & Send</button>
-                <button class="btn btn-primary" style="flex:1" onclick="saveOnly()">Save Only</button>
-            </div>
+            <button class="btn btn-success" onclick="saveAndSendBill()">Save & WhatsApp</button>
+            <button class="btn btn-primary" onclick="saveOnly()">Save Fast</button>
         </div>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard" class="tab-content">
-        <div class="form-card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-            <select id="monthFilter" onchange="filterDashboard()">
-                <option value="current">Current Month</option>
-            </select>
-            <button class="btn btn-primary" onclick="captureScreenshot()">Screenshot</button>
+        <div class="form-card" style="display:flex; gap:10px">
+            <select id="monthFilter" onchange="filterDashboard()"><option value="current">Current Month</option></select>
+            <button class="btn btn-primary" style="margin:0; width:70px" onclick="captureScreenshot('screenshotArea')"><i class="fas fa-camera"></i></button>
         </div>
-        <div class="table-container">
-            <table id="dashTable">
-                <thead><tr><th>Flat</th><th>Month</th><th>Consumed</th><th>Amount</th><th>Action</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <div class="table-container"><table><thead><tr><th>Flat</th><th>Units</th><th>Amt</th><th>Share</th><th>Del</th></tr></thead><tbody id="billBody"></tbody></table></div>
     </div>
 
-    <!-- Bulk Generate -->
     <div id="bulk" class="tab-content">
         <div class="form-card">
-            <h3 style="color:var(--primary);margin-bottom:16px">Bulk Bill Generate</h3>
-            <div class="form-group">
-                <label>Month</label>
-                <select id="bulkMonth">
-                    <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
-                    <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Select Floor</label>
-                <select id="bulkFloor" onchange="loadFlatsForBulk()">
-                    <option value="">Select Floor</option>
-                    <option value="1">1st Floor (101, 102)</option>
-                    <option value="2">2nd Floor (201, 202)</option>
-                    <option value="3">3rd Floor (301, 302)</option>
-                    <option value="4">Common Area</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Total Amount to Distribute (₹)</label>
-                <input id="bulkTotalAmount" type="number" placeholder="Enter total floor/common bill amount">
-            </div>
-            <div id="bulkFlatInputs" style="margin:20px 0"></div>
-            <button class="btn btn-success" onclick="generateBulkBills()">Generate & Save Bills</button>
+            <div class="form-group"><label>Floor</label><select id="bulkFloor" onchange="loadFlatsForBulk()"><option value="">Select</option><option value="1">1st Floor</option><option value="2">2nd Floor</option><option value="3">3rd Floor</option><option value="4">Common</option></select></div>
+            <div class="form-group"><label>Total Amount</label><input id="bulkTotalAmount" type="number"></div>
+            <div id="bulkFlatInputs"></div>
+            <button class="btn btn-success" onclick="generateBulkBills()">Generate & Save</button>
         </div>
     </div>
 
-    <!-- Salary Tab -->
     <div id="salary" class="tab-content">
-        <div class="form-card hidden-form" id="salaryForm">
-            <h3 style="margin-bottom:16px;color:var(--primary)">New Salary Payment Entry</h3>
-            <div class="form-group">
-                <label>Date</label>
-                <input id="salaryDate" type="date">
-            </div>
-            <div class="form-group">
-                <label>Amount (₹)</label>
-                <input id="salaryAmount" type="number" min="0">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="salaryStatus">
-                    <option>Paid</option>
-                    <option selected>Pending</option>
-                </select>
-            </div>
-            <div style="display:flex;gap:12px">
-                <button class="btn btn-primary" style="flex:1" onclick="saveSalary()">Save</button>
-                <button class="btn btn-danger" style="flex:1" onclick="hideSalaryForm()">Cancel</button>
-            </div>
+        <div class="flex-header">
+            <h3>Staff Salary</h3>
+            <button class="btn btn-primary" style="margin:0; width:50px; padding:8px" onclick="captureScreenshot('salary')"><i class="fas fa-camera"></i></button>
         </div>
-
-        <div style="text-align:center; margin:20px 0;">
-            <button class="add-entry-btn" onclick="showSalaryForm()" title="Add New Salary Entry"><i class="fas fa-plus"></i></button>
+        <div class="form-card" style="margin-bottom:10px; padding:15px;">
+            <label>Monthly Salary Target (Total)</label>
+            <input type="number" id="salaryTarget" placeholder="Enter Total Salary" oninput="displaySalary()" value="5000">
         </div>
-
-        <div class="summary-card">
-            <h3 style="margin:0 0 16px 0;color:var(--primary)">Salary Summary</h3>
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <h4>Total Paid</h4>
-                    <div class="amount positive" id="salaryTotalPaid">₹0</div>
-                </div>
-                <div class="summary-item">
-                    <h4>Total Pending</h4>
-                    <div class="amount" id="salaryTotalPending" style="color:var(--warning)">₹0</div>
-                </div>
-                <div class="summary-item positive">
-                    <h4>Remaining to Pay</h4>
-                    <div class="amount" id="salaryRemaining">₹0</div>
-                </div>
-            </div>
-            <div style="margin-top:16px;text-align:right">
-                <button class="btn btn-primary" onclick="captureScreenshot()">Take Screenshot</button>
-            </div>
+        <div class="summary-grid">
+            <div class="summary-item sum-green"><small>Paid</small><span class="amount" id="salaryTotalPaid">₹0</span></div>
+            <div class="summary-item sum-red"><small>Pending Balance</small><span class="amount" id="salaryTotalPending">₹0</span></div>
         </div>
-
-        <div class="table-container">
-            <table id="salaryTable">
-                <thead><tr><th>S.No</th><th>Date</th><th>Amount (₹)</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody></tbody>
-            </table>
+        <div class="form-card">
+            <input id="salaryDate" type="date" class="form-group">
+            <input id="salaryAmount" type="number" placeholder="Amount Paid" class="form-group">
+            <select id="salaryStatus" class="form-group"><option>Paid</option></select>
+            <button class="btn btn-primary" onclick="saveSalary()">Save Salary</button>
         </div>
+        <div class="table-container"><table><thead><tr><th>Date</th><th>Amt</th><th>Status</th><th></th></tr></thead><tbody id="salaryBody"></tbody></table></div>
     </div>
 
-    <!-- Maintenance Tab -->
     <div id="maintenance" class="tab-content">
-        <div class="form-card hidden-form" id="maintenanceForm">
-            <h3 style="margin-bottom:16px;color:var(--primary)">New Maintenance Entry</h3>
-            <div class="form-group">
-                <label>Date</label>
-                <input id="maintDate" type="date">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <input id="maintDesc" type="text" placeholder="e.g. Lift repair, Common light bill">
-            </div>
-            <div class="form-group">
-                <label>Amount (₹)</label>
-                <input id="maintAmount" type="number" min="0">
-            </div>
-            <div class="form-group">
-                <label>Type</label>
-                <select id="maintType">
-                    <option>Received</option>
-                    <option selected>Expense</option>
-                </select>
-            </div>
-            <div style="display:flex;gap:12px">
-                <button class="btn btn-primary" style="flex:1" onclick="saveMaintenance()">Save</button>
-                <button class="btn btn-danger" style="flex:1" onclick="hideMaintenanceForm()">Cancel</button>
-            </div>
+        <div class="flex-header">
+            <h3>Building Fund</h3>
+            <button class="btn btn-primary" style="margin:0; width:50px; padding:8px" onclick="captureScreenshot('maintenance')"><i class="fas fa-camera"></i></button>
         </div>
-
-        <div style="text-align:center; margin:20px 0;">
-            <button class="add-entry-btn" onclick="showMaintenanceForm()" title="Add New Maintenance Entry"><i class="fas fa-plus"></i></button>
+        <div class="summary-grid">
+            <div class="summary-item sum-green"><small>In</small><span class="amount" id="maintTotalReceived">0</span></div>
+            <div class="summary-item sum-red"><small>Out</small><span class="amount" id="maintTotalExpenses">0</span></div>
+            <div class="summary-item sum-blue"><small>Net</small><span class="amount" id="maintNetBalance">0</span></div>
         </div>
-
-        <div class="summary-card">
-            <h3 style="margin:0 0 16px 0;color:var(--primary)">Maintenance Account Summary</h3>
-            <div class="summary-grid">
-                <div class="summary-item positive"><h4>Total Received</h4><div class="amount" id="maintTotalReceived">₹0</div></div>
-                <div class="summary-item negative"><h4>Total Expenses</h4><div class="amount" id="maintTotalExpenses">₹0</div></div>
-                <div class="summary-item" style="background:rgba(99,102,241,0.08)"><h4>Net Balance</h4><div class="amount" id="maintNetBalance">₹0</div></div>
-            </div>
-            <div style="margin-top:16px;text-align:right">
-                <button class="btn btn-primary" onclick="captureScreenshot()">Take Screenshot</button>
-            </div>
+        <div class="form-card">
+            <input id="maintDate" type="date" class="form-group">
+            <input id="maintDesc" type="text" placeholder="Description" class="form-group">
+            <input id="maintAmount" type="number" placeholder="Amount" class="form-group">
+            <select id="maintType" class="form-group"><option>Received</option><option selected>Expense</option></select>
+            <label>Bill Photo</label><input id="maintPhoto" type="file" accept="image/*">
+            <button class="btn btn-primary" onclick="saveMaintenance()">Save Entry</button>
         </div>
-
-        <div class="table-container">
-            <table id="maintTable">
-                <thead><tr><th>S.No</th><th>Date</th><th>Description</th><th>Amount (₹)</th><th>Type</th><th>Action</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <div class="table-container"><table><thead><tr><th>Date</th><th>Desc</th><th>Amt</th><th>Bill</th><th></th></tr></thead><tbody id="maintBody"></tbody></table></div>
     </div>
-
 </div>
 
 <script>
-// ──────────────────────────────────────────────────────────────
-// DATA STORAGE
-// ──────────────────────────────────────────────────────────────
-let billData = JSON.parse(localStorage.getItem('billData') || '[]');
-let lastClosingUnits = JSON.parse(localStorage.getItem('lastClosingUnits') || '{}');
-let salaryData = JSON.parse(localStorage.getItem('salaryData') || '[]');
-let maintenanceData = JSON.parse(localStorage.getItem('maintenanceData') || '[]');
-
-const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const currentMonth = months[new Date().getMonth()];
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybBMMSElG7Vc7asLAhO8mOhahrhsNlfxybWkgoe7mGetWLCw1a-TQQH7nkO5jLu7B0HQ/exec"; 
+let billData = [], lastClosingUnits = {}, salaryData = [], maintenanceData = [];
+const currentMonthName = ['January','February','March','April','May','June','July','August','September','October','November','December'][new Date().getMonth()];
 const floors = {1:['101','102'], 2:['201','202'], 3:['301','302'], 4:['Common Area']};
 
-// ──────────────────────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('month').value = currentMonth;
-    document.getElementById('bulkMonth').value = currentMonth;
-    filterDashboard();
-    displaySalary();
-    displayMaintenance();
-});
-
-// ──────────────────────────────────────────────────────────────
-// THEME
-// ──────────────────────────────────────────────────────────────
-function toggleTheme(){
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    document.querySelector('.theme-btn i').classList.toggle('fa-moon');
-    document.querySelector('.theme-btn i').classList.toggle('fa-sun');
-}
-if(localStorage.getItem('theme') === 'dark') toggleTheme();
-
-// ──────────────────────────────────────────────────────────────
-// TABS
-// ──────────────────────────────────────────────────────────────
-function openTab(targetTab) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(targetTab).classList.add('active');
-    document.querySelector(`.tab-btn[data-tab="${targetTab}"]`).classList.add('active');
-
-    if (targetTab === 'dashboard') filterDashboard();
-    if (targetTab === 'salary') displaySalary();
-    if (targetTab === 'maintenance') displayMaintenance();
+async function cloudSync() {
+    document.getElementById('loader').style.display = 'block';
+    try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        billData = data.billData || [];
+        lastClosingUnits = data.lastClosingUnits || {};
+        salaryData = data.salaryData || [];
+        maintenanceData = data.maintenanceData || [];
+        refreshUIs();
+    } catch(e) { console.log("Sync failed"); }
+    document.getElementById('loader').style.display = 'none';
 }
 
-document.querySelectorAll('.tab-btn').forEach(button => {
-    button.addEventListener('click', () => openTab(button.getAttribute('data-tab')));
-});
-
-// ──────────────────────────────────────────────────────────────
-// ELECTRICITY FUNCTIONS
-// ──────────────────────────────────────────────────────────────
-function autoFillPrev(){
-    const flat = document.getElementById('flat').value;
-    document.getElementById('prev').value = lastClosingUnits[flat] || '';
-    calculateUnits();
+function fastPost(sheetName, action, rowData, id = null) {
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ sheetName, action, rowData, id })
+    });
+    
+    if(action === 'add') {
+        if(sheetName === 'Salary') salaryData.push({id: rowData[0], date: rowData[1], amount: rowData[2], status: rowData[3]});
+        if(sheetName === 'Bills') billData.push({id: rowData[0], month: rowData[1], flat: rowData[2], prev: rowData[3], current: rowData[4], consumed: rowData[5], amount: rowData[6], toDate: rowData[7]});
+        if(sheetName === 'Maintenance') maintenanceData.push({id: rowData[0], date: rowData[1], desc: rowData[2], amount: rowData[3], type: rowData[4], photo: rowData[5]});
+    }
+    if(action === 'delete') {
+        if(sheetName === 'Bills') billData = billData.filter(b => b.id != id);
+        if(sheetName === 'Salary') salaryData = salaryData.filter(b => b.id != id);
+        if(sheetName === 'Maintenance') maintenanceData = maintenanceData.filter(b => b.id != id);
+    }
+    refreshUIs();
 }
 
-function calculateUnits(){
-    const prev = parseFloat(document.getElementById('prev').value) || 0;
-    const curr = parseFloat(document.getElementById('current').value) || 0;
-    document.getElementById('consumed').value = Math.max(curr - prev, 0);
-}
-
-function getFormData(){
-    return {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2,9),
-        month: document.getElementById('month').value,
-        flat: document.getElementById('flat').value,
-        prev: document.getElementById('prev').value || 0,
-        current: document.getElementById('current').value || 0,
-        consumed: document.getElementById('consumed').value || 0,
-        amount: document.getElementById('amount').value || 0,
-        toDate: new Date().toISOString().slice(0,10)
-    };
+function autoFillPrev(){ document.getElementById('prev').value = lastClosingUnits[document.getElementById('flat').value] || 0; }
+function calculateUnits(){ 
+    const p = parseFloat(document.getElementById('prev').value)||0; 
+    const c = parseFloat(document.getElementById('current').value)||0; 
+    document.getElementById('consumed').value = Math.max(c-p, 0); 
 }
 
 function saveOnly(){
-    const data = getFormData();
-    if(!data.flat || !data.current || !data.amount) return alert('Fill all fields');
-    lastClosingUnits[data.flat] = data.current;
-    localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
-    billData.push(data);
-    localStorage.setItem('billData', JSON.stringify(billData));
-    alert('Saved');
-    clearForm();
-    filterDashboard();
+    const d = { 
+        id: "B"+Date.now(), 
+        flat: document.getElementById('flat').value, 
+        month: document.getElementById('month').value, 
+        current: document.getElementById('current').value, 
+        prev: document.getElementById('prev').value, 
+        consumed: document.getElementById('consumed').value, 
+        amount: document.getElementById('amount').value,
+        date: new Date().toLocaleDateString()
+    };
+    if(!d.flat || !d.current) return alert("Fill all fields");
+    fastPost("Units", "updateUnit", [d.flat, d.current]);
+    fastPost("Bills", "add", [d.id, d.month, d.flat, d.prev, d.current, d.consumed, d.amount, d.date]);
+    document.getElementById('current').value = ''; document.getElementById('amount').value = '';
 }
 
 function saveAndSendBill(){
-    const data = getFormData();
-    if(!data.flat || !data.current || !data.amount) return alert('Fill all fields');
-    lastClosingUnits[data.flat] = data.current;
-    localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
-    billData.push(data);
-    localStorage.setItem('billData', JSON.stringify(billData));
+    const flat = document.getElementById('flat').value;
+    const curr = document.getElementById('current').value;
+    if(!flat || !curr) return alert("Fill all fields");
+    
+    const message = formatBillMessage({
+        month: document.getElementById('month').value,
+        flat: flat,
+        date: new Date().toLocaleDateString(),
+        prev: document.getElementById('prev').value,
+        current: curr,
+        consumed: document.getElementById('consumed').value,
+        amount: document.getElementById('amount').value
+    });
 
-    const msg = `*Majestic Heights - Shivapuri*\n\nElectricity Bill - ${data.month}\n\nFlat No: *${data.flat}*\nReading Date: ${data.toDate}\nPrevious Reading: ${data.prev} units\nCurrent Reading : ${data.current} units\nTotal Consumed : ${data.consumed} units\n\nAmount: *Rs${data.amount}/-*\n\nPlease pay at the earliest.\nThank you!\nMajestic Heights`;
-    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
-
-    clearForm();
-    filterDashboard();
+    saveOnly();
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
 }
 
-function clearForm(){
-    document.querySelectorAll('#form input, #form select').forEach(el => {
-        if(el.type !== 'file') el.value = '';
-    });
-    document.getElementById('month').value = currentMonth;
+function formatBillMessage(b) {
+    return `*Majestic Heights - Shivapuri*\n\n` +
+           `*Electricity Bill - ${b.month}*\n\n` +
+           `Flat No: *${b.flat}*\n` +
+           `Reading Date: ${b.date || 'Today'}\n` +
+           `Previous Reading: ${b.prev} units\n` +
+           `Current Reading: ${b.current} units\n` +
+           `Total Consumed: *${b.consumed} units*\n\n` +
+           `*Amount: Rs ${b.amount}/-*\n\n` +
+           `Please pay at the earliest.\n` +
+           `Thank you!\n` +
+           `Majestic Heights`;
 }
 
 function filterDashboard(){
-    const filter = document.getElementById('monthFilter');
-    const selected = filter.value === 'current' ? currentMonth : filter.value;
-
-    const unique = [...new Set(billData.map(b => b.month))];
-    filter.innerHTML = `<option value="current">Current Month (${currentMonth})</option>`;
-    unique.sort((a,b) => months.indexOf(a) - months.indexOf(b)).forEach(m => {
-        filter.innerHTML += `<option>${m}</option>`;
-    });
-
-    const filtered = billData.filter(b => b.month === selected);
-    const tbody = document.querySelector('#dashTable tbody');
-    tbody.innerHTML = '';
-    filtered.forEach(b => {
-        tbody.innerHTML += `<tr>
-            <td><strong>${b.flat}</strong></td>
-            <td>${b.month}</td>
-            <td>${b.consumed} units</td>
+    const body = document.getElementById('billBody'); body.innerHTML = '';
+    billData.forEach(b => {
+        body.innerHTML += `<tr>
+            <td>${b.flat}</td>
+            <td>${b.consumed}</td>
             <td>₹${b.amount}</td>
-            <td style="display:flex;gap:6px">
-                <button class="action-btn action-whatsapp" onclick="resendBill('${b.id}')">Send</button>
-                <button class="action-btn action-delete" onclick="deleteBill('${b.id}')">Delete</button>
-            </td>
+            <td><button class="action-btn btn-wa" onclick="resend('${b.id}')"><i class="fab fa-whatsapp"></i></button></td>
+            <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td>
         </tr>`;
     });
 }
 
-function resendBill(id){
-    const b = billData.find(x => x.id === id);
-    if(!b) return;
-    const msg = `*Majestic Heights - Shivapuri*\n\nElectricity Bill - ${b.month}\n\nFlat No: *${b.flat}*\nReading Date: ${b.toDate}\nPrevious Reading: ${b.prev} units\nCurrent Reading : ${b.current} units\nTotal Consumed : ${b.consumed} units\n\nAmount: *Rs${b.amount}/-*\n\nPlease pay at the earliest.\nThank you!\nMajestic Heights`;
-    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+function resend(id){
+    const b = billData.find(x => x.id == id);
+    const msg = formatBillMessage({
+        month: b.month,
+        flat: b.flat,
+        date: b.toDate,
+        prev: b.prev,
+        current: b.current,
+        consumed: b.consumed,
+        amount: b.amount
+    });
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-function deleteBill(id){
-    if(confirm('Delete this bill?')){
-        billData = billData.filter(x => x.id !== id);
-        localStorage.setItem('billData', JSON.stringify(billData));
-        filterDashboard();
-    }
-}
-
-// ──────────────────────────────────────────────────────────────
-// SALARY
-// ──────────────────────────────────────────────────────────────
-function showSalaryForm(){
-    document.getElementById('salaryForm').classList.remove('hidden-form');
-    document.getElementById('salaryDate').value = new Date().toISOString().split('T')[0];
-}
-
-function hideSalaryForm(){
-    document.getElementById('salaryForm').classList.add('hidden-form');
-    document.getElementById('salaryDate').value = '';
-    document.getElementById('salaryAmount').value = '';
-}
+function deleteItem(sheet, id){ if(confirm("Delete?")) fastPost(sheet, "delete", null, id); }
 
 function saveSalary(){
-    const date = document.getElementById('salaryDate').value;
-    const amount = parseFloat(document.getElementById('salaryAmount').value);
-    const status = document.getElementById('salaryStatus').value;
-
-    if(!date || isNaN(amount) || amount <= 0)
-        return alert('Please fill valid date and amount');
-
-    salaryData.push({
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2,9),
-        date,
-        amount,
-        status
-    });
-
-    localStorage.setItem('salaryData', JSON.stringify(salaryData));
-    hideSalaryForm();
-    displaySalary();
+    const r = ["S"+Date.now(), document.getElementById('salaryDate').value, document.getElementById('salaryAmount').value, document.getElementById('salaryStatus').value];
+    fastPost("Salary", "add", r);
 }
 
+// THE CHANGED FUNCTION:
 function displaySalary(){
-    const tbody = document.querySelector('#salaryTable tbody');
-    tbody.innerHTML = '';
-
-    let totalPaid = 0;
-    let totalPending = 0;
-
-    salaryData.forEach((entry, index) => {
-        if(entry.status === 'Paid')
-            totalPaid += entry.amount;
-        else
-            totalPending += entry.amount;
-
-        tbody.innerHTML += `
-            <tr>
-                <td>${index+1}</td>
-                <td>${entry.date}</td>
-                <td>₹${entry.amount.toLocaleString('en-IN')}</td>
-                <td style="color:${entry.status==='Paid'?'var(--success)':'var(--warning)'}">${entry.status}</td>
-                <td><button class="action-btn action-delete" onclick="deleteSalary('${entry.id}')">Delete</button></td>
-            </tr>`;
+    const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
+    const target = parseFloat(document.getElementById('salaryTarget').value) || 0;
+    let paidTotal = 0;
+    
+    salaryData.forEach(s => {
+        paidTotal += parseFloat(s.amount) || 0;
+        body.innerHTML += `<tr><td>${s.date}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
-
-    const remaining = totalPending - totalPaid;
-
-    document.getElementById('salaryTotalPaid').textContent    = `₹${totalPaid.toLocaleString('en-IN')}`;
-    document.getElementById('salaryTotalPending').textContent = `₹${totalPending.toLocaleString('en-IN')}`;
-    document.getElementById('salaryRemaining').textContent    = `₹${remaining.toLocaleString('en-IN')}`;
-
-    document.getElementById('salaryRemaining').style.color =
-        remaining > 0 ? 'var(--warning)' :
-        remaining < 0 ? 'var(--danger)' : 'var(--success)';
+    
+    // Calculate Pending = Target - Total Paid
+    let pending = target - paidTotal;
+    
+    document.getElementById('salaryTotalPaid').innerText = "₹" + paidTotal; 
+    document.getElementById('salaryTotalPending').innerText = "₹" + (pending < 0 ? 0 : pending);
 }
 
-function deleteSalary(id){
-    if(confirm('Delete this salary entry?')){
-        salaryData = salaryData.filter(x => x.id !== id);
-        localStorage.setItem('salaryData', JSON.stringify(salaryData));
-        displaySalary();
-    }
+async function saveMaintenance(){
+    const file = document.getElementById('maintPhoto').files[0];
+    let photo = ""; if(file) { const reader = new FileReader(); reader.readAsDataURL(file); photo = await new Promise(res => reader.onload = () => res(reader.result)); }
+    const r = ["M"+Date.now(), document.getElementById('maintDate').value, document.getElementById('maintDesc').value, document.getElementById('maintAmount').value, document.getElementById('maintType').value, photo];
+    fastPost("Maintenance", "add", r);
 }
-
-// ──────────────────────────────────────────────────────────────
-// MAINTENANCE
-// ──────────────────────────────────────────────────────────────
-function showMaintenanceForm(){
-    document.getElementById('maintenanceForm').classList.remove('hidden-form');
-    document.getElementById('maintDate').value = new Date().toISOString().split('T')[0];
-}
-
-function hideMaintenanceForm(){
-    document.getElementById('maintenanceForm').classList.add('hidden-form');
-    document.getElementById('maintDate').value = '';
-    document.getElementById('maintDesc').value = '';
-    document.getElementById('maintAmount').value = '';
-}
-
-function saveMaintenance(){
-    const date = document.getElementById('maintDate').value;
-    const desc = document.getElementById('maintDesc').value.trim();
-    const amount = parseFloat(document.getElementById('maintAmount').value);
-    const type = document.getElementById('maintType').value;
-
-    if(!date || !desc || isNaN(amount) || amount <= 0)
-        return alert('Please fill valid date, description and amount');
-
-    maintenanceData.push({
-        id: Date.now().toString(36)+Math.random().toString(36).substr(2,9),
-        date, desc, amount, type
-    });
-
-    localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
-    hideMaintenanceForm();
-    displayMaintenance();
-}
-
 function displayMaintenance(){
-    const tbody = document.querySelector('#maintTable tbody');
-    tbody.innerHTML = '';
-
-    let totalReceived = 0;
-    let totalExpenses = 0;
-
-    maintenanceData.forEach((entry, index) => {
-        if(entry.type === 'Received') totalReceived += entry.amount;
-        else totalExpenses += entry.amount;
-
-        tbody.innerHTML += `<tr>
-            <td>${index+1}</td>
-            <td>${entry.date}</td>
-            <td>${entry.desc}</td>
-            <td>₹${entry.amount.toLocaleString('en-IN')}</td>
-            <td style="color:${entry.type==='Received'?'var(--success)':'var(--danger)'}">${entry.type}</td>
-            <td><button class="action-btn action-delete" onclick="deleteMaintenance('${entry.id}')">Delete</button></td>
-        </tr>`;
+    const body = document.getElementById('maintBody'); body.innerHTML = ''; let r=0, e=0;
+    maintenanceData.forEach(m => {
+        if(m.type==='Received') r+=parseFloat(m.amount); else e+=parseFloat(m.amount);
+        const img = m.photo ? `<img src="${m.photo}" class="img-preview" onclick="window.open('${m.photo}')">` : '-';
+        body.innerHTML += `<tr><td>${m.date}</td><td>${m.desc}</td><td>₹${m.amount}</td><td>${img}</td><td><button onclick="deleteItem('Maintenance','${m.id}')">X</button></td></tr>`;
     });
-
-    const netBalance = totalReceived - totalExpenses;
-
-    document.getElementById('maintTotalReceived').textContent = `₹${totalReceived.toLocaleString('en-IN')}`;
-    document.getElementById('maintTotalExpenses').textContent = `₹${totalExpenses.toLocaleString('en-IN')}`;
-    document.getElementById('maintNetBalance').textContent = `₹${netBalance.toLocaleString('en-IN')}`;
-    document.getElementById('maintNetBalance').style.color = netBalance >= 0 ? 'var(--success)' : 'var(--danger)';
+    document.getElementById('maintTotalReceived').innerText = "₹"+r; document.getElementById('maintTotalExpenses').innerText = "₹"+e; document.getElementById('maintNetBalance').innerText = "₹"+(r-e);
 }
 
-function deleteMaintenance(id){
-    if(confirm('Delete this maintenance entry?')){
-        maintenanceData = maintenanceData.filter(x => x.id !== id);
-        localStorage.setItem('maintenanceData', JSON.stringify(maintenanceData));
-        displayMaintenance();
-    }
+function refreshUIs(){ filterDashboard(); displaySalary(); displayMaintenance(); }
+function toggleTheme(){ document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'':'dark'); }
+function openTab(t){ document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(t).classList.add('active'); document.querySelector(`[data-tab="${t}"]`).classList.add('active'); }
+document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => openTab(btn.dataset.tab));
+
+function captureScreenshot(elementId){ 
+    const el = document.getElementById(elementId);
+    html2canvas(el, { backgroundColor: null }).then(c => { 
+        const a = document.createElement('a'); a.href = c.toDataURL(); a.download = `${elementId}_Report.png`; a.click(); 
+    }); 
 }
 
-// ──────────────────────────────────────────────────────────────
-// UTILITIES
-// ──────────────────────────────────────────────────────────────
-function captureScreenshot(){
-    html2canvas(document.getElementById('screenshotArea'), {scale:2}).then(canvas => {
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = `Majestic_Heights_${new Date().toISOString().slice(0,10)}.png`;
-        a.click();
-    });
-}
-
-function loadFlatsForBulk(){
-    const floor = document.getElementById('bulkFloor').value;
-    const container = document.getElementById('bulkFlatInputs');
-    container.innerHTML = '';
-    if(!floor) return;
-
-    floors[floor].forEach(flat => {
-        const prev = lastClosingUnits[flat] || 0;
-        container.innerHTML += `
-        <div class="form-group" style="background:#f0f8ff;padding:12px;border-radius:10px;margin-bottom:10px">
-            <label style="font-weight:bold">Flat ${flat}</label>
-            <div style="display:flex;gap:10px;align-items:center">
-                <div style="flex:1">
-                    <small>Previous: ${prev} units</small><br>
-                    <input type="number" id="current_${flat}" placeholder="Current Reading" style="margin-top:4px">
-                </div>
-                <div style="width:100px;text-align:center">
-                    <small>Consumed</small><br>
-                    <strong id="cons_${flat}" style="color:var(--primary)">0</strong>
-                </div>
-            </div>
-        </div>`;
-
-        document.getElementById(`current_${flat}`).oninput = function(){
-            const curr = parseFloat(this.value) || 0;
-            document.getElementById(`cons_${flat}`).textContent = Math.max(curr - prev, 0);
-        };
-    });
-}
-
-function generateBulkBills(){
-    const month = document.getElementById('bulkMonth').value;
-    const floor = document.getElementById('bulkFloor').value;
-    const totalAmt = parseFloat(document.getElementById('bulkTotalAmount').value);
-
-    if(!month || !floor || !totalAmt) return alert('Please select month, floor and enter total amount');
-
-    let totalConsumed = 0;
-    const bills = [];
-
-    floors[floor].forEach(flat => {
-        const current = parseFloat(document.getElementById(`current_${flat}`).value) || 0;
-        const prev = parseFloat(lastClosingUnits[flat] || 0);
-        const consumed = Math.max(current - prev, 0);
-        totalConsumed += consumed;
-        bills.push({flat, current, consumed, prev});
-    });
-
-    if(totalConsumed === 0) return alert('Enter valid current readings');
-
-    bills.forEach(b => {
-        const amount = Math.round((b.consumed / totalConsumed) * totalAmt);
-        const bill = {
-            id: Date.now().toString(36)+Math.random().toString(36).substr(2,9),
-            flat: b.flat,
-            month: month,
-            prev: b.prev,
-            current: b.current,
-            consumed: b.consumed,
-            amount: amount,
-            toDate: new Date().toISOString().slice(0,10)
-        };
-        lastClosingUnits[b.flat] = b.current;
-        billData.push(bill);
-    });
-
-    localStorage.setItem('lastClosingUnits', JSON.stringify(lastClosingUnits));
-    localStorage.setItem('billData', JSON.stringify(billData));
-
-    alert(`Bulk bills generated successfully for ${month} - Floor ${floor}!\nTotal: ₹${totalAmt}`);
+function loadFlatsForBulk(){ const f = document.getElementById('bulkFloor').value; const c = document.getElementById('bulkFlatInputs'); c.innerHTML = ''; if(!f) return; floors[f].forEach(fl => c.innerHTML += `<div class="form-group"><label>Flat ${fl}</label><input type="number" id="bulk_${fl}"></div>`); }
+async function generateBulkBills(){
+    const floor = document.getElementById('bulkFloor').value; const total = parseFloat(document.getElementById('bulkTotalAmount').value); let cons = 0; let items = [];
+    floors[floor].forEach(f => { const curr = parseFloat(document.getElementById(`bulk_${f}`).value)||0; const prev = parseFloat(lastClosingUnits[f]||0); const diff = Math.max(curr-prev, 0); cons += diff; items.push({f, curr, prev, diff}); });
+    for(let i of items){ const amt = Math.round((i.diff/cons)*total); fastPost("Units", "updateUnit", [i.f, i.curr]); fastPost("Bills", "add", ["B"+Date.now()+i.f, currentMonthName, i.f, i.prev, i.curr, i.diff, amt, new Date().toLocaleDateString()]); }
     openTab('dashboard');
 }
+
+window.onload = cloudSync;
 </script>
 </body>
 </html>
-
-
-

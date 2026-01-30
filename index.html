@@ -54,17 +54,13 @@ table { width: 100%; border-collapse: collapse; min-width: 300px; }
 th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.65rem; color: #8E8E93; text-transform: uppercase; }
 td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
 
-.img-preview { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
-
 #loader { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; display: none; z-index: 9999; }
 .theme-btn, .fab { position: fixed; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .theme-btn { top: 15px; right: 15px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); color: white; }
 .fab { bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; font-size: 1.2rem; }
-.flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-.action-btn { border: 0; background: transparent; padding: 8px; cursor: pointer; font-size: 1.1rem; border-radius: 50%; transition: 0.2s; }
+.action-btn { border: 0; background: transparent; padding: 8px; cursor: pointer; font-size: 1.1rem; border-radius: 50%; }
 .btn-wa { color: #32CD32; background: rgba(60, 179, 113, 0.2);} 
-.btn-wa:hover { background: rgba(50, 205, 50, 0.2); }
 .btn-del { color: var(--danger); }
 </style>
 </head>
@@ -108,17 +104,7 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
         </div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>Flat</th>
-                        <th>Prev</th>
-                        <th>Curr</th>
-                        <th>Cons.</th>
-                        <th>Amt</th>
-                        <th>WA</th>
-                        <th>Del</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Flat</th><th>Prev</th><th>Curr</th><th>Cons.</th><th>Amt</th><th>WA</th><th>Del</th></tr></thead>
                 <tbody id="billBody"></tbody>
             </table>
         </div>
@@ -134,32 +120,42 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
     </div>
 
     <div id="salary" class="tab-content">
-        <div class="flex-header">
-            <h3>Staff Salary</h3>
-            <button class="btn btn-primary" style="margin:0; width:50px; padding:8px" onclick="captureScreenshot('salary')"><i class="fas fa-camera"></i></button>
-        </div>
-        <div class="form-card" style="margin-bottom:10px; padding:15px;">
-            <label>Monthly Salary Target (Total)</label>
-            <input type="number" id="salaryTarget" placeholder="Enter Total Salary" oninput="displaySalary()" value="5000">
-        </div>
         <div class="summary-grid">
             <div class="summary-item sum-green"><small>Paid</small><span class="amount" id="salaryTotalPaid">₹0</span></div>
-            <div class="summary-item sum-red"><small>Pending Balance</small><span class="amount" id="salaryTotalPending">₹0</span></div>
+            <div class="summary-item sum-red"><small>Pending</small><span class="amount" id="salaryTotalPending">₹0</span></div>
+            <div class="summary-item sum-blue"><small>Total Budget</small><span class="amount" id="salaryTotalBudget">₹0</span></div>
         </div>
         <div class="form-card">
-            <input id="salaryDate" type="date" class="form-group">
-            <input id="salaryAmount" type="number" placeholder="Amount Paid" class="form-group">
-            <select id="salaryStatus" class="form-group"><option>Paid</option></select>
-            <button class="btn btn-primary" onclick="saveSalary()">Save Salary</button>
+            <div class="form-group">
+                <label>Staff/Purpose</label>
+                <select id="salaryStaff">
+                    <option>Security Guard</option>
+                    <option>Cleaning Staff</option>
+                    <option>Maintenance Help</option>
+                    <option>Water Tanker</option>
+                    <option>Others</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Amount</label><input id="salaryAmount" type="number"></div>
+            <div class="form-group"><label>Date</label><input id="salaryDate" type="date"></div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="salaryStatus">
+                    <option value="Paid">Paid</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveSalary()">Save Salary Entry</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Amt</th><th>Status</th><th></th></tr></thead><tbody id="salaryBody"></tbody></table></div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Date</th><th>Purpose</th><th>Amt</th><th>Status</th><th>Del</th></tr></thead>
+                <tbody id="salaryBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="maintenance" class="tab-content">
-        <div class="flex-header">
-            <h3>Building Fund</h3>
-            <button class="btn btn-primary" style="margin:0; width:50px; padding:8px" onclick="captureScreenshot('maintenance')"><i class="fas fa-camera"></i></button>
-        </div>
         <div class="summary-grid">
             <div class="summary-item sum-green"><small>In</small><span class="amount" id="maintTotalReceived">0</span></div>
             <div class="summary-item sum-red"><small>Out</small><span class="amount" id="maintTotalExpenses">0</span></div>
@@ -170,10 +166,9 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
             <input id="maintDesc" type="text" placeholder="Description" class="form-group">
             <input id="maintAmount" type="number" placeholder="Amount" class="form-group">
             <select id="maintType" class="form-group"><option>Received</option><option selected>Expense</option></select>
-            <label>Bill Photo</label><input id="maintPhoto" type="file" accept="image/*">
             <button class="btn btn-primary" onclick="saveMaintenance()">Save Entry</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>Date</th><th>Desc</th><th>Amt</th><th>Bill</th><th></th></tr></thead><tbody id="maintBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>Date</th><th>Desc</th><th>Amt</th><th>Del</th></tr></thead><tbody id="maintBody"></tbody></table></div>
     </div>
 </div>
 
@@ -203,7 +198,6 @@ function updateFilterOptions() {
     const filter = document.getElementById('monthFilter');
     const monthsWithData = [...new Set(billData.map(b => b.month))];
     if(!monthsWithData.includes(currentMonthName)) monthsWithData.push(currentMonthName);
-    
     filter.innerHTML = monthsWithData.map(m => `<option value="${m}" ${m === currentMonthName ? 'selected' : ''}>${m}</option>`).join('');
 }
 
@@ -211,33 +205,19 @@ function filterDashboard(){
     const selectedMonth = document.getElementById('monthFilter').value;
     const body = document.getElementById('billBody'); 
     body.innerHTML = '';
-    
-    const filtered = billData.filter(b => b.month === selectedMonth);
-    
-    filtered.forEach(b => {
-        body.innerHTML += `<tr>
-            <td>${b.flat}</td>
-            <td>${b.prev}</td>
-            <td>${b.current}</td>
-            <td><b>${b.consumed}</b></td>
-            <td>₹${b.amount}</td>
+    billData.filter(b => b.month === selectedMonth).forEach(b => {
+        body.innerHTML += `<tr><td>${b.flat}</td><td>${b.prev}</td><td>${b.current}</td><td><b>${b.consumed}</b></td><td>₹${b.amount}</td>
             <td><button class="action-btn btn-wa" onclick="resend('${b.id}')"><i class="fab fa-whatsapp"></i></button></td>
-            <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
+            <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
     });
 }
 
 function fastPost(sheetName, action, rowData, id = null) {
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ sheetName, action, rowData, id })
-    });
-    
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ sheetName, action, rowData, id }) });
     if(action === 'add') {
-        if(sheetName === 'Salary') salaryData.push({id: rowData[0], date: rowData[1], amount: rowData[2], status: rowData[3]});
+        if(sheetName === 'Salary') salaryData.push({id: rowData[0], date: rowData[1], amount: rowData[2], status: rowData[3], staff: rowData[4]});
         if(sheetName === 'Bills') billData.push({id: rowData[0], month: rowData[1], flat: rowData[2], prev: rowData[3], current: rowData[4], consumed: rowData[5], amount: rowData[6], toDate: rowData[7]});
-        if(sheetName === 'Maintenance') maintenanceData.push({id: rowData[0], date: rowData[1], desc: rowData[2], amount: rowData[3], type: rowData[4], photo: rowData[5]});
+        if(sheetName === 'Maintenance') maintenanceData.push({id: rowData[0], date: rowData[1], desc: rowData[2], amount: rowData[3], type: rowData[4]});
     }
     if(action === 'delete') {
         if(sheetName === 'Bills') billData = billData.filter(b => b.id != id);
@@ -255,16 +235,7 @@ function calculateUnits(){
 }
 
 function saveOnly(){
-    const d = { 
-        id: "B"+Date.now(), 
-        flat: document.getElementById('flat').value, 
-        month: document.getElementById('month').value, 
-        current: document.getElementById('current').value, 
-        prev: document.getElementById('prev').value, 
-        consumed: document.getElementById('consumed').value, 
-        amount: document.getElementById('amount').value,
-        date: new Date().toLocaleDateString()
-    };
+    const d = { id: "B"+Date.now(), flat: document.getElementById('flat').value, month: document.getElementById('month').value, current: document.getElementById('current').value, prev: document.getElementById('prev').value, consumed: document.getElementById('consumed').value, amount: document.getElementById('amount').value, date: new Date().toLocaleDateString() };
     if(!d.flat || !d.current) return alert("Fill all fields");
     fastPost("Units", "updateUnit", [d.flat, d.current]);
     fastPost("Bills", "add", [d.id, d.month, d.flat, d.prev, d.current, d.consumed, d.amount, d.date]);
@@ -272,89 +243,52 @@ function saveOnly(){
 }
 
 function saveAndSendBill(){
-    const flat = document.getElementById('flat').value;
-    const curr = document.getElementById('current').value;
-    const prev = document.getElementById('prev').value;
-    const cons = document.getElementById('consumed').value;
-    const amt = document.getElementById('amount').value;
-    const mnt = document.getElementById('month').value;
-    
-    if(!flat || !curr) return alert("Fill all fields");
-    
-    const message = formatBillMessage({
-        month: mnt,
-        flat: flat,
-        date: new Date().toLocaleDateString(),
-        prev: prev,
-        current: curr,
-        consumed: cons,
-        amount: amt
-    });
-
     saveOnly();
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-}
-
-function formatBillMessage(b) {
-    return `*Majestic Heights - Shivapuri*\n\n` +
-           `*Electricity Bill - ${b.month}*\n\n` +
-           `Flat No: *${b.flat}*\n` +
-           `Reading Date: ${b.date || 'Today'}\n` +
-           `Previous Reading: ${b.prev} units\n` +
-           `Current Reading: ${b.current} units\n` +
-           `Total Consumed: *${b.consumed} units*\n\n` +
-           `*Amount: Rs ${b.amount}/-*\n\n` +
-           `Please pay at the earliest.\n` +
-           `Thank you!\n` +
-           `Majestic Heights`;
+    const b = { month: document.getElementById('month').value, flat: document.getElementById('flat').value, prev: document.getElementById('prev').value, current: document.getElementById('current').value, consumed: document.getElementById('consumed').value, amount: document.getElementById('amount').value };
+    const msg = `*Majestic Heights*\nBill: ${b.month}\nFlat: ${b.flat}\nPrev: ${b.prev}\nCurr: ${b.current}\nCons: *${b.consumed}*\nAmt: *₹${b.amount}*`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function resend(id){
     const b = billData.find(x => x.id == id);
-    const msg = formatBillMessage({
-        month: b.month,
-        flat: b.flat,
-        date: b.toDate,
-        prev: b.prev,
-        current: b.current,
-        consumed: b.consumed,
-        amount: b.amount
-    });
+    const msg = `*Majestic Heights*\nBill: ${b.month}\nFlat: ${b.flat}\nPrev: ${b.prev}\nCurr: ${b.current}\nCons: *${b.consumed}*\nAmt: *₹${b.amount}*`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function deleteItem(sheet, id){ if(confirm("Delete?")) fastPost(sheet, "delete", null, id); }
 
+// UPDATED SALARY LOGIC TO MATCH MAINTENANCE SUMMARY
 function saveSalary(){
-    const r = ["S"+Date.now(), document.getElementById('salaryDate').value, document.getElementById('salaryAmount').value, document.getElementById('salaryStatus').value];
-    fastPost("Salary", "add", r);
+    const staff = document.getElementById('salaryStaff').value;
+    const amt = document.getElementById('salaryAmount').value;
+    const date = document.getElementById('salaryDate').value || new Date().toISOString().split('T')[0];
+    const status = document.getElementById('salaryStatus').value;
+    if(!amt) return alert("Enter Amount");
+    fastPost("Salary", "add", ["S"+Date.now(), date, amt, status, staff]);
 }
 
 function displaySalary(){
     const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
-    const target = parseFloat(document.getElementById('salaryTarget').value) || 0;
-    let paidTotal = 0;
+    let paid = 0, pending = 0;
     salaryData.forEach(s => {
-        paidTotal += parseFloat(s.amount) || 0;
-        body.innerHTML += `<tr><td>${s.date}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
+        const val = parseFloat(s.amount) || 0;
+        if(s.status === 'Paid') paid += val; else pending += val;
+        body.innerHTML += `<tr><td>${s.date}</td><td>${s.staff || 'Staff'}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
-    let pending = target - paidTotal;
-    document.getElementById('salaryTotalPaid').innerText = "₹" + paidTotal; 
-    document.getElementById('salaryTotalPending').innerText = "₹" + (pending < 0 ? 0 : pending);
+    document.getElementById('salaryTotalPaid').innerText = "₹" + paid;
+    document.getElementById('salaryTotalPending').innerText = "₹" + pending;
+    document.getElementById('salaryTotalBudget').innerText = "₹" + (paid + pending);
 }
 
-async function saveMaintenance(){
-    const file = document.getElementById('maintPhoto').files[0];
-    let photo = ""; if(file) { const reader = new FileReader(); reader.readAsDataURL(file); photo = await new Promise(res => reader.onload = () => res(reader.result)); }
-    const r = ["M"+Date.now(), document.getElementById('maintDate').value, document.getElementById('maintDesc').value, document.getElementById('maintAmount').value, document.getElementById('maintType').value, photo];
+function saveMaintenance(){
+    const r = ["M"+Date.now(), document.getElementById('maintDate').value, document.getElementById('maintDesc').value, document.getElementById('maintAmount').value, document.getElementById('maintType').value];
     fastPost("Maintenance", "add", r);
 }
 function displayMaintenance(){
     const body = document.getElementById('maintBody'); body.innerHTML = ''; let r=0, e=0;
     maintenanceData.forEach(m => {
         if(m.type==='Received') r+=parseFloat(m.amount); else e+=parseFloat(m.amount);
-        const img = m.photo ? `<img src="${m.photo}" class="img-preview" onclick="window.open('${m.photo}')">` : '-';
-        body.innerHTML += `<tr><td>${m.date}</td><td>${m.desc}</td><td>₹${m.amount}</td><td>${img}</td><td><button onclick="deleteItem('Maintenance','${m.id}')">X</button></td></tr>`;
+        body.innerHTML += `<tr><td>${m.date}</td><td>${m.desc}</td><td>₹${m.amount}</td><td><button onclick="deleteItem('Maintenance','${m.id}')">X</button></td></tr>`;
     });
     document.getElementById('maintTotalReceived').innerText = "₹"+r; document.getElementById('maintTotalExpenses').innerText = "₹"+e; document.getElementById('maintNetBalance').innerText = "₹"+(r-e);
 }
@@ -364,19 +298,30 @@ function toggleTheme(){ document.documentElement.setAttribute('data-theme', docu
 function openTab(t){ document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(t).classList.add('active'); document.querySelector(`[data-tab="${t}"]`).classList.add('active'); }
 document.querySelectorAll('.tab-btn').forEach(btn => btn.onclick = () => openTab(btn.dataset.tab));
 
+function loadFlatsForBulk(){ const f = document.getElementById('bulkFloor').value; const c = document.getElementById('bulkFlatInputs'); c.innerHTML = ''; if(!f) return; floors[f].forEach(fl => {
+    const prev = lastClosingUnits[fl] || 0;
+    c.innerHTML += `<div class="form-card" style="padding:10px; margin-bottom:10px;">
+        <label>Flat ${fl} (Prev: ${prev})</label>
+        <input type="number" id="bulk_${fl}" placeholder="Current Reading">
+    </div>`;
+}); }
+
+async function generateBulkBills(){
+    const floor = document.getElementById('bulkFloor').value; const total = parseFloat(document.getElementById('bulkTotalAmount').value); let cons = 0; let items = [];
+    floors[floor].forEach(f => { const curr = parseFloat(document.getElementById(`bulk_${f}`).value)||0; const prev = parseFloat(lastClosingUnits[f]||0); const diff = Math.max(curr-prev, 0); cons += diff; items.push({f, curr, prev, diff}); });
+    for(let i of items){ 
+        const amt = cons > 0 ? Math.round((i.diff/cons)*total) : 0; 
+        fastPost("Units", "updateUnit", [i.f, i.curr]); 
+        fastPost("Bills", "add", ["B"+Date.now()+i.f, currentMonthName, i.f, i.prev, i.curr, i.diff, amt, new Date().toLocaleDateString()]); 
+    }
+    openTab('dashboard');
+}
+
 function captureScreenshot(elementId){ 
     const el = document.getElementById(elementId);
     html2canvas(el, { backgroundColor: null }).then(c => { 
         const a = document.createElement('a'); a.href = c.toDataURL(); a.download = `${elementId}_Report.png`; a.click(); 
     }); 
-}
-
-function loadFlatsForBulk(){ const f = document.getElementById('bulkFloor').value; const c = document.getElementById('bulkFlatInputs'); c.innerHTML = ''; if(!f) return; floors[f].forEach(fl => c.innerHTML += `<div class="form-group"><label>Flat ${fl}</label><input type="number" id="bulk_${fl}"></div>`); }
-async function generateBulkBills(){
-    const floor = document.getElementById('bulkFloor').value; const total = parseFloat(document.getElementById('bulkTotalAmount').value); let cons = 0; let items = [];
-    floors[floor].forEach(f => { const curr = parseFloat(document.getElementById(`bulk_${f}`).value)||0; const prev = parseFloat(lastClosingUnits[f]||0); const diff = Math.max(curr-prev, 0); cons += diff; items.push({f, curr, prev, diff}); });
-    for(let i of items){ const amt = Math.round((i.diff/cons)*total); fastPost("Units", "updateUnit", [i.f, i.curr]); fastPost("Bills", "add", ["B"+Date.now()+i.f, currentMonthName, i.f, i.prev, i.curr, i.diff, amt, new Date().toLocaleDateString()]); }
-    openTab('dashboard');
 }
 
 window.onload = cloudSync;

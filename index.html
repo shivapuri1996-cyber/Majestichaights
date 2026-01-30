@@ -16,7 +16,7 @@
     --bg: #000000; --card: rgba(28, 28, 30, 0.9); --text: #FFFFFF; --border: rgba(255,255,255,0.1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SF Pro Display', sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 16px; transition: 0.3s; font-size: 14px; } /* Increased base font size */
+body { background: var(--bg); color: var(--text); padding: 16px; transition: 0.3s; font-size: 14px; }
 
 header { 
     background: linear-gradient(135deg, #007AFF, #5856D6); 
@@ -40,7 +40,6 @@ input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px sol
 .btn { padding: 14px; border-radius: 12px; border: 0; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.2s; font-size: 1rem; }
 .btn-primary { background: var(--primary); color: white; }
 .btn-success { background: var(--success); color: white; }
-.btn-danger { background: var(--danger); color: white; }
 
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
 .summary-item { padding: 15px; border-radius: 15px; color: white; text-align: center; }
@@ -158,9 +157,21 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybBMMSElG7Vc7asLAhO8mOhahrhsNlfxybWkgoe7mGetWLCw1a-TQQH7nkO5jLu7B0HQ/exec"; 
 let billData = [], lastClosingUnits = {}, salaryData = [], maintenanceData = [];
-const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const currentMonthName = monthNames[new Date().getMonth()];
+const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fullMonthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const currentMonthName = fullMonthNames[new Date().getMonth()];
 const floors = {1:['101','102'], 2:['201','202'], 3:['301','302'], 4:['Common Area']};
+
+// Helper for Date Formatting: 1-Jan-26
+function formatDateCustom(dateStr) {
+    if(!dateStr) return '-';
+    const d = new Date(dateStr);
+    if(isNaN(d)) return dateStr;
+    const day = d.getDate();
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear().toString().substr(-2);
+    return `${day}-${month}-${year}`;
+}
 
 async function cloudSync() {
     document.getElementById('loader').style.display = 'block';
@@ -221,7 +232,7 @@ function formatWhatsAppMessage(b) {
     return `*Majestic Heights - Shivapuri*\n\n` +
            `*Electricity Bill - ${b.month}*\n\n` +
            `Flat No: *${b.flat}*\n` +
-           `Reading Date: ${b.date}\n` +
+           `Reading Date: ${formatDateCustom(b.date)}\n` +
            `Previous Reading: ${b.prev} units\n` +
            `Current Reading : ${b.current} units\n` +
            `Total Consumed  : *${b.consumed} units*\n\n` +
@@ -253,7 +264,6 @@ function resend(id){
 
 function deleteItem(sheet, id){ if(confirm("Delete?")) fastPost(sheet, "delete", null, id); }
 
-// SALARY LOGIC (Pending = All Pending Entries - All Paid Entries)
 function saveSalary(){
     const staff = document.getElementById('salaryStaff').value;
     const amt = document.getElementById('salaryAmount').value;
@@ -266,15 +276,13 @@ function saveSalary(){
 
 function displaySalary(){
     const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
-    let totalPaid = 0;
-    let totalPending = 0;
+    let totalPaid = 0; let totalPending = 0;
     salaryData.forEach(s => {
         const val = parseFloat(s.amount) || 0;
         if(s.status === 'Paid') totalPaid += val; else totalPending += val;
-        body.innerHTML += `<tr><td>${s.date}</td><td>${s.staff || 'Staff'}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
+        body.innerHTML += `<tr><td>${formatDateCustom(s.date)}</td><td>${s.staff || 'Staff'}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
     document.getElementById('salaryTotalPaid').innerText = "₹" + totalPaid;
-    // Displaying Pending as Pending Total minus Paid Total
     document.getElementById('salaryTotalPending').innerText = "₹" + (totalPending - totalPaid);
 }
 
@@ -298,7 +306,7 @@ function displayMaintenance(){
     maintenanceData.forEach(m => {
         if(m.type==='Received') r+=parseFloat(m.amount); else e+=parseFloat(m.amount);
         const img = m.photo ? `<img src="${m.photo}" class="img-preview" onclick="window.open('${m.photo}')">` : '-';
-        body.innerHTML += `<tr><td>${m.date}</td><td>${m.desc}</td><td>₹${m.amount}</td><td>${img}</td><td><button onclick="deleteItem('Maintenance','${m.id}')">X</button></td></tr>`;
+        body.innerHTML += `<tr><td>${formatDateCustom(m.date)}</td><td>${m.desc}</td><td>₹${m.amount}</td><td>${img}</td><td><button onclick="deleteItem('Maintenance','${m.id}')">X</button></td></tr>`;
     });
     document.getElementById('maintTotalReceived').innerText = "₹"+r; document.getElementById('maintTotalExpenses').innerText = "₹"+e; document.getElementById('maintNetBalance').innerText = "₹"+(r-e);
 }

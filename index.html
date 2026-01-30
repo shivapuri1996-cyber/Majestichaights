@@ -16,17 +16,17 @@
     --bg: #000000; --card: rgba(28, 28, 30, 0.9); --text: #FFFFFF; --border: rgba(255,255,255,0.1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SF Pro Display', sans-serif; }
-body { background: var(--bg); color: var(--text); padding: 16px; transition: 0.3s; }
+body { background: var(--bg); color: var(--text); padding: 16px; transition: 0.3s; font-size: 14px; } /* Increased base font size */
 
 header { 
     background: linear-gradient(135deg, #007AFF, #5856D6); 
     padding: 25px 20px; border-radius: 20px; color: white; margin-bottom: 20px; 
     box-shadow: 0 8px 20px rgba(0,122,255,0.2); 
 }
-header h1 { font-size: 1.6rem; }
+header h1 { font-size: 1.8rem; }
 
 .tabs { display: flex; background: rgba(118,118,128,0.12); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 10px; border: 0; background: transparent; cursor: pointer; font-weight: 600; border-radius: 10px; color: var(--text); font-size: 0.8rem; }
+.tab-btn { flex: 1; padding: 12px; border: 0; background: transparent; cursor: pointer; font-weight: 600; border-radius: 10px; color: var(--text); font-size: 0.9rem; }
 .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
 .tab-content { display: none; }
@@ -34,34 +34,34 @@ header h1 { font-size: 1.6rem; }
 
 .form-card { background: var(--card); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
 .form-group { margin-bottom: 12px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.8rem; opacity: 0.7; }
-input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; outline: none; }
+label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; opacity: 0.7; }
+input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 16px; outline: none; }
 
-.btn { padding: 14px; border-radius: 12px; border: 0; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.2s; }
+.btn { padding: 14px; border-radius: 12px; border: 0; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: 0.2s; font-size: 1rem; }
 .btn-primary { background: var(--primary); color: white; }
 .btn-success { background: var(--success); color: white; }
 .btn-danger { background: var(--danger); color: white; }
 
-.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
 .summary-item { padding: 15px; border-radius: 15px; color: white; text-align: center; }
 .sum-blue { background: linear-gradient(135deg, #007AFF, #00C6FF); }
 .sum-green { background: linear-gradient(135deg, #34C759, #32E0C4); }
 .sum-red { background: linear-gradient(135deg, #FF3B30, #FF2D55); }
-.amount { font-size: 1.1rem; font-weight: 700; display: block; }
+.amount { font-size: 1.3rem; font-weight: 700; display: block; }
 
 .table-container { background: var(--card); border-radius: 15px; overflow-x: auto; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; min-width: 300px; }
-th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.65rem; color: #8E8E93; text-transform: uppercase; }
-td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.75rem; color: #8E8E93; text-transform: uppercase; }
+td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
 
-.img-preview { width: 35px; height: 35px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; }
+.img-preview { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; }
 
-#loader { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; display: none; z-index: 9999; }
+#loader { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; display: none; z-index: 9999; }
 .theme-btn, .fab { position: fixed; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.theme-btn { top: 15px; right: 15px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); color: white; }
-.fab { bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; font-size: 1.2rem; }
+.theme-btn { top: 15px; right: 15px; width: 45px; height: 45px; background: rgba(255,255,255,0.2); color: white; }
+.fab { bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--primary); color: white; font-size: 1.4rem; }
 
-.action-btn { border: 0; background: transparent; padding: 8px; cursor: pointer; font-size: 1.1rem; border-radius: 50%; }
+.action-btn { border: 0; background: transparent; padding: 8px; cursor: pointer; font-size: 1.2rem; border-radius: 50%; }
 .btn-wa { color: #32CD32; background: rgba(60, 179, 113, 0.2);} 
 .btn-del { color: var(--danger); }
 </style>
@@ -75,7 +75,7 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
 <div class="container" id="screenshotArea">
     <header>
         <h1>Majestic Heights</h1>
-        <p style="font-size: 0.8rem; opacity: 0.9;">Shivapuri Billing System</p>
+        <p style="font-size: 0.9rem; opacity: 0.9;">Shivapuri Billing System</p>
     </header>
 
     <div class="tabs">
@@ -123,16 +123,15 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
 
     <div id="salary" class="tab-content">
         <div class="summary-grid">
-            <div class="summary-item sum-green"><small>Paid</small><span class="amount" id="salaryTotalPaid">₹0</span></div>
-            <div class="summary-item sum-red"><small>Pending</small><span class="amount" id="salaryTotalPending">₹0</span></div>
-            <div class="summary-item sum-blue"><small>Total Budget</small><span class="amount" id="salaryTotalBudget">₹0</span></div>
+            <div class="summary-item sum-green"><small>Total Paid</small><span class="amount" id="salaryTotalPaid">₹0</span></div>
+            <div class="summary-item sum-red"><small>Pending Balance</small><span class="amount" id="salaryTotalPending">₹0</span></div>
         </div>
         <div class="form-card">
             <div class="form-group"><label>Staff/Purpose</label><select id="salaryStaff"><option>Security Guard</option><option>Cleaning Staff</option><option>Maintenance Help</option><option>Water Tanker</option><option>Others</option></select></div>
             <div class="form-group"><label>Amount</label><input id="salaryAmount" type="number"></div>
             <div class="form-group"><label>Date</label><input id="salaryDate" type="date"></div>
             <div class="form-group"><label>Status</label><select id="salaryStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select></div>
-            <button class="btn btn-primary" onclick="saveSalary()">Save Salary Entry</button>
+            <button class="btn btn-primary" onclick="saveSalary()">Record Entry</button>
         </div>
         <div class="table-container"><table><thead><tr><th>Date</th><th>Purpose</th><th>Amt</th><th>Status</th><th>Del</th></tr></thead><tbody id="salaryBody"></tbody></table></div>
     </div>
@@ -148,7 +147,7 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
             <input id="maintDesc" type="text" placeholder="Description" class="form-group">
             <input id="maintAmount" type="number" placeholder="Amount" class="form-group">
             <select id="maintType" class="form-group"><option>Received</option><option selected>Expense</option></select>
-            <label style="font-size: 0.7rem;">Attach Photo/Bill</label>
+            <label style="font-size: 0.8rem;">Attach Photo/Bill</label>
             <input id="maintPhoto" type="file" accept="image/*" class="form-group">
             <button class="btn btn-primary" onclick="saveMaintenance()">Save Entry</button>
         </div>
@@ -254,6 +253,7 @@ function resend(id){
 
 function deleteItem(sheet, id){ if(confirm("Delete?")) fastPost(sheet, "delete", null, id); }
 
+// SALARY LOGIC (Pending = All Pending Entries - All Paid Entries)
 function saveSalary(){
     const staff = document.getElementById('salaryStaff').value;
     const amt = document.getElementById('salaryAmount').value;
@@ -261,19 +261,21 @@ function saveSalary(){
     const status = document.getElementById('salaryStatus').value;
     if(!amt) return alert("Enter Amount");
     fastPost("Salary", "add", ["S"+Date.now(), date, amt, status, staff]);
+    document.getElementById('salaryAmount').value = '';
 }
 
 function displaySalary(){
     const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
-    let paid = 0, pending = 0;
+    let totalPaid = 0;
+    let totalPending = 0;
     salaryData.forEach(s => {
         const val = parseFloat(s.amount) || 0;
-        if(s.status === 'Paid') paid += val; else pending += val;
+        if(s.status === 'Paid') totalPaid += val; else totalPending += val;
         body.innerHTML += `<tr><td>${s.date}</td><td>${s.staff || 'Staff'}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
-    document.getElementById('salaryTotalPaid').innerText = "₹" + paid;
-    document.getElementById('salaryTotalPending').innerText = "₹" + pending;
-    document.getElementById('salaryTotalBudget').innerText = "₹" + (paid + pending);
+    document.getElementById('salaryTotalPaid').innerText = "₹" + totalPaid;
+    // Displaying Pending as Pending Total minus Paid Total
+    document.getElementById('salaryTotalPending').innerText = "₹" + (totalPending - totalPaid);
 }
 
 async function saveMaintenance(){
@@ -287,6 +289,8 @@ async function saveMaintenance(){
     const r = ["M"+Date.now(), document.getElementById('maintDate').value, document.getElementById('maintDesc').value, document.getElementById('maintAmount').value, document.getElementById('maintType').value, photo];
     fastPost("Maintenance", "add", r);
     document.getElementById('maintPhoto').value = "";
+    document.getElementById('maintAmount').value = "";
+    document.getElementById('maintDesc').value = "";
 }
 
 function displayMaintenance(){

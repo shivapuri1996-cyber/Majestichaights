@@ -51,8 +51,8 @@ input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px sol
 
 .table-container { background: var(--card); border-radius: 15px; overflow-x: auto; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; min-width: 300px; }
-th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.7rem; color: #8E8E93; text-transform: uppercase; }
-td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+th { padding: 12px; background: rgba(0,0,0,0.02); font-size: 0.65rem; color: #8E8E93; text-transform: uppercase; }
+td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
 
 .img-preview { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
 
@@ -106,7 +106,22 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
             <select id="monthFilter" onchange="filterDashboard()"><option value="current">Current Month</option></select>
             <button class="btn btn-primary" style="margin:0; width:70px" onclick="captureScreenshot('screenshotArea')"><i class="fas fa-camera"></i></button>
         </div>
-        <div class="table-container"><table><thead><tr><th>Flat</th><th>Units</th><th>Amt</th><th>Share</th><th>Del</th></tr></thead><tbody id="billBody"></tbody></table></div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Flat</th>
+                        <th>Prev</th>
+                        <th>Curr</th>
+                        <th>Cons.</th>
+                        <th>Amt</th>
+                        <th>WA</th>
+                        <th>Del</th>
+                    </tr>
+                </thead>
+                <tbody id="billBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="bulk" class="tab-content">
@@ -229,16 +244,21 @@ function saveOnly(){
 function saveAndSendBill(){
     const flat = document.getElementById('flat').value;
     const curr = document.getElementById('current').value;
+    const prev = document.getElementById('prev').value;
+    const cons = document.getElementById('consumed').value;
+    const amt = document.getElementById('amount').value;
+    const mnt = document.getElementById('month').value;
+    
     if(!flat || !curr) return alert("Fill all fields");
     
     const message = formatBillMessage({
-        month: document.getElementById('month').value,
+        month: mnt,
         flat: flat,
         date: new Date().toLocaleDateString(),
-        prev: document.getElementById('prev').value,
+        prev: prev,
         current: curr,
-        consumed: document.getElementById('consumed').value,
-        amount: document.getElementById('amount').value
+        consumed: cons,
+        amount: amt
     });
 
     saveOnly();
@@ -259,12 +279,15 @@ function formatBillMessage(b) {
            `Majestic Heights`;
 }
 
+// UPDATED BILLS DASHBOARD TO SHOW PREV, CURRENT, AND CONSUMED
 function filterDashboard(){
     const body = document.getElementById('billBody'); body.innerHTML = '';
     billData.forEach(b => {
         body.innerHTML += `<tr>
             <td>${b.flat}</td>
-            <td>${b.consumed}</td>
+            <td>${b.prev}</td>
+            <td>${b.current}</td>
+            <td><b>${b.consumed}</b></td>
             <td>₹${b.amount}</td>
             <td><button class="action-btn btn-wa" onclick="resend('${b.id}')"><i class="fab fa-whatsapp"></i></button></td>
             <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td>
@@ -293,7 +316,6 @@ function saveSalary(){
     fastPost("Salary", "add", r);
 }
 
-// THE CHANGED FUNCTION:
 function displaySalary(){
     const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
     const target = parseFloat(document.getElementById('salaryTarget').value) || 0;
@@ -304,9 +326,7 @@ function displaySalary(){
         body.innerHTML += `<tr><td>${s.date}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
     
-    // Calculate Pending = Target - Total Paid
     let pending = target - paidTotal;
-    
     document.getElementById('salaryTotalPaid').innerText = "₹" + paidTotal; 
     document.getElementById('salaryTotalPending').innerText = "₹" + (pending < 0 ? 0 : pending);
 }

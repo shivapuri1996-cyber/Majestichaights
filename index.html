@@ -103,7 +103,7 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
 
     <div id="dashboard" class="tab-content">
         <div class="form-card" style="display:flex; gap:10px">
-            <select id="monthFilter" onchange="filterDashboard()"><option value="current">Current Month</option></select>
+            <select id="monthFilter" onchange="filterDashboard()"></select>
             <button class="btn btn-primary" style="margin:0; width:70px" onclick="captureScreenshot('screenshotArea')"><i class="fas fa-camera"></i></button>
         </div>
         <div class="table-container">
@@ -180,7 +180,8 @@ td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybBMMSElG7Vc7asLAhO8mOhahrhsNlfxybWkgoe7mGetWLCw1a-TQQH7nkO5jLu7B0HQ/exec"; 
 let billData = [], lastClosingUnits = {}, salaryData = [], maintenanceData = [];
-const currentMonthName = ['January','February','March','April','May','June','July','August','September','October','November','December'][new Date().getMonth()];
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const currentMonthName = monthNames[new Date().getMonth()];
 const floors = {1:['101','102'], 2:['201','202'], 3:['301','302'], 4:['Common Area']};
 
 async function cloudSync() {
@@ -192,9 +193,38 @@ async function cloudSync() {
         lastClosingUnits = data.lastClosingUnits || {};
         salaryData = data.salaryData || [];
         maintenanceData = data.maintenanceData || [];
+        updateFilterOptions();
         refreshUIs();
     } catch(e) { console.log("Sync failed"); }
     document.getElementById('loader').style.display = 'none';
+}
+
+function updateFilterOptions() {
+    const filter = document.getElementById('monthFilter');
+    const monthsWithData = [...new Set(billData.map(b => b.month))];
+    if(!monthsWithData.includes(currentMonthName)) monthsWithData.push(currentMonthName);
+    
+    filter.innerHTML = monthsWithData.map(m => `<option value="${m}" ${m === currentMonthName ? 'selected' : ''}>${m}</option>`).join('');
+}
+
+function filterDashboard(){
+    const selectedMonth = document.getElementById('monthFilter').value;
+    const body = document.getElementById('billBody'); 
+    body.innerHTML = '';
+    
+    const filtered = billData.filter(b => b.month === selectedMonth);
+    
+    filtered.forEach(b => {
+        body.innerHTML += `<tr>
+            <td>${b.flat}</td>
+            <td>${b.prev}</td>
+            <td>${b.current}</td>
+            <td><b>${b.consumed}</b></td>
+            <td>₹${b.amount}</td>
+            <td><button class="action-btn btn-wa" onclick="resend('${b.id}')"><i class="fab fa-whatsapp"></i></button></td>
+            <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td>
+        </tr>`;
+    });
 }
 
 function fastPost(sheetName, action, rowData, id = null) {
@@ -279,22 +309,6 @@ function formatBillMessage(b) {
            `Majestic Heights`;
 }
 
-// UPDATED BILLS DASHBOARD TO SHOW PREV, CURRENT, AND CONSUMED
-function filterDashboard(){
-    const body = document.getElementById('billBody'); body.innerHTML = '';
-    billData.forEach(b => {
-        body.innerHTML += `<tr>
-            <td>${b.flat}</td>
-            <td>${b.prev}</td>
-            <td>${b.current}</td>
-            <td><b>${b.consumed}</b></td>
-            <td>₹${b.amount}</td>
-            <td><button class="action-btn btn-wa" onclick="resend('${b.id}')"><i class="fab fa-whatsapp"></i></button></td>
-            <td><button class="action-btn btn-del" onclick="deleteItem('Bills','${b.id}')"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
-    });
-}
-
 function resend(id){
     const b = billData.find(x => x.id == id);
     const msg = formatBillMessage({
@@ -320,12 +334,10 @@ function displaySalary(){
     const body = document.getElementById('salaryBody'); body.innerHTML = ''; 
     const target = parseFloat(document.getElementById('salaryTarget').value) || 0;
     let paidTotal = 0;
-    
     salaryData.forEach(s => {
         paidTotal += parseFloat(s.amount) || 0;
         body.innerHTML += `<tr><td>${s.date}</td><td>₹${s.amount}</td><td>${s.status}</td><td><button onclick="deleteItem('Salary','${s.id}')">X</button></td></tr>`;
     });
-    
     let pending = target - paidTotal;
     document.getElementById('salaryTotalPaid').innerText = "₹" + paidTotal; 
     document.getElementById('salaryTotalPending').innerText = "₹" + (pending < 0 ? 0 : pending);
